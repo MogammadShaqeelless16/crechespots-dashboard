@@ -136,7 +136,7 @@ export const QuotesFormModal: FC<Props> = ({
                 icon={<PlusCircleOutlined />}
                 onClick={() => replace(`company-create?to=${pathname}`)}
               >
-                Add new company
+                Add new student
               </Button>
             }
           >
