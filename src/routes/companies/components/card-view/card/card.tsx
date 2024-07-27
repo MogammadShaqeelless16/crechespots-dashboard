@@ -168,7 +168,7 @@ export const CompanyCard: FC<Props> = ({ company }) => {
             alignItems: "center",
           }}
         >
-          <Text type="secondary">Open deals amount</Text>
+          <Text type="secondary">Student Fee Owe</Text>
           <Text
             strong
             size="md"

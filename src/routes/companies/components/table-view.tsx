@@ -105,7 +105,7 @@ export const CompaniesTableView: FC<Props> = ({ tableProps, filters }) => {
       />
       <Table.Column<Company>
         dataIndex={"totalRevenue"}
-        title="Open deals amount"
+        title="Student Fees"
         render={(_, company) => {
           return (
             <Text>

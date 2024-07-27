@@ -94,7 +94,7 @@ export const resources: IResourceItem[] = [
     create: "/companies/create",
     edit: "/companies/edit/:id",
     meta: {
-      label: "Companies",
+      label: "Student",
       // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
       icon: <ShopOutlined />,
     },

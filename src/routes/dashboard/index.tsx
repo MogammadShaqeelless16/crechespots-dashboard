@@ -8,8 +8,6 @@ import { CalendarUpcomingEvents } from "@/components";
 import type { DashboardTotalCountsQuery } from "@/graphql/types";
 
 import {
-  CompaniesMap,
-  DashboardDealsChart,
   DashboardLatestActivities,
   DashboardTasksChart,
   DashboardTotalCountCard,
@@ -50,33 +48,6 @@ export const DashboardPage: React.FC = () => {
         </Col>
       </Row>
 
-      <Row
-        gutter={[32, 32]}
-        style={{
-          marginTop: "32px",
-        }}
-      >
-        <Col
-          xs={24}
-          sm={24}
-          xl={8}
-          style={{
-            height: "432px",
-          }}
-        >
-          <DashboardTotalRevenueChart />
-        </Col>
-        <Col
-          xs={24}
-          sm={24}
-          xl={16}
-          style={{
-            height: "432px",
-          }}
-        >
-          <DashboardDealsChart />
-        </Col>
-      </Row>
 
       <Row
         gutter={[32, 32]}
@@ -116,7 +87,7 @@ export const DashboardPage: React.FC = () => {
             height: "448px",
           }}
         >
-          <CompaniesMap />
+
         </Col>
       </Row>
     </div>
