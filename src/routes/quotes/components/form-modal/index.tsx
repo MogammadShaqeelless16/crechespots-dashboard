@@ -105,9 +105,9 @@ export const QuotesFormModal: FC<Props> = ({
           <Form.Item
             rules={[{ required: true }]}
             name="title"
-            label="Quotes title"
+            label="Application Name"
           >
-            <Input placeholder="Please enter quote title" />
+            <Input placeholder="Please enter student name" />
           </Form.Item>
           <Form.Item
             rules={[{ required: true }]}
