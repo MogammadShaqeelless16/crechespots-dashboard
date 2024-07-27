@@ -126,7 +126,7 @@ export const resources: IResourceItem[] = [
     edit: "/quotes/edit/:id",
     show: "/quotes/show/:id",
     meta: {
-      label: "Quotes",
+      label: "Applications",
       // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
       icon: <ContainerOutlined />,
     },
