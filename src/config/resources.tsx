@@ -127,7 +127,7 @@ export const resources: IResourceItem[] = [
     edit: "/contacts/edit/:id",
     show: "/contacts/show/:id",
     meta: {
-      label: "Contacts",
+      label: "Parents",
       // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
       icon: <TeamOutlined />,
     },

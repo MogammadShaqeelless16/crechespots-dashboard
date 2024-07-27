@@ -382,7 +382,7 @@ const ContactForm = () => {
                   marginBottom: hasContacts ? 16 : 0,
                 }}
               >
-                Add new contact
+                Add new parent
               </Button>
             </div>
           );
