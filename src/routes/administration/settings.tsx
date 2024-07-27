@@ -233,7 +233,7 @@ const companyInfo = [
   },
   {
     label: "Website",
-    value: "https://globexcorp.com",
+    value: "https://crechespots.onrender.com/",
     // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
     icon: <GlobalOutlined className="tertiary" />,
   },
