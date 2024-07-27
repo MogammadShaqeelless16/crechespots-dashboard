@@ -124,7 +124,7 @@ export const CompanyQuotesTable: FC<Props> = ({ style }) => {
                 marginRight: 4,
               }}
             />{" "}
-            Add quotes
+            Add Application
           </Link>
         </Space>
       )}

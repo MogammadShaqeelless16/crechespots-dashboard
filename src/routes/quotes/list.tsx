@@ -169,12 +169,12 @@ export const QuotesListPage: FC<PropsWithChildren> = ({ children }) => {
           />
           <Table.Column<Quote>
             dataIndex={["company", "id"]}
-            title="Company"
+            title="Application"
             defaultFilteredValue={getDefaultFilter("company.id", filters, "in")}
             filterDropdown={(props) => (
               <FilterDropdown {...props}>
                 <Select
-                  placeholder="Search Company"
+                  placeholder="Search Applications"
                   style={{ width: 220 }}
                   {...selectPropsCompanies}
                 />

@@ -95,7 +95,7 @@ export const TableView: React.FC<Props> = ({
         filterDropdown={(props) => (
           <FilterDropdown {...props}>
             <Select
-              placeholder="Search Company"
+              placeholder="Search Application"
               style={{ width: 220 }}
               {...selectProps}
             />

@@ -52,7 +52,7 @@ export const CompaniesTableView: FC<Props> = ({ tableProps, filters }) => {
         filterIcon={<SearchOutlined />}
         filterDropdown={(props) => (
           <FilterDropdown {...props}>
-            <Input placeholder="Search Company" />
+            <Input placeholder="Search Application" />
           </FilterDropdown>
         )}
         render={(_, record) => {
