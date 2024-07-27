@@ -156,7 +156,7 @@ const variants: {
         />
       </IconWrapper>
     ),
-    title: "Number of companies",
+    title: "Number of students",
     data: [
       {
         index: "1",
@@ -236,7 +236,7 @@ const variants: {
         />
       </IconWrapper>
     ),
-    title: "Total deals in pipeline",
+    title: "Number Of Applications",
     data: [
       {
         index: "1",
