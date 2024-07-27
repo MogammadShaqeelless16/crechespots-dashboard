@@ -34,7 +34,7 @@ export const SettingsPage = () => {
           borderBottom: "1px solid #D9D9D9",
         }}
       >
-        <Logo width={96} height={96} />
+        <Logo/>
         <Text style={{ fontSize: "32px", fontWeight: 700 }}>
           CrecheSpots
         </Text>
