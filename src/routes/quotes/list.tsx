@@ -145,7 +145,7 @@ export const QuotesListPage: FC<PropsWithChildren> = ({ children }) => {
             marginTop: "28px",
           },
         }}
-        title={<ListTitleButton buttonText="Add quote" toPath="quotes" />}
+        title={<ListTitleButton buttonText="Add applications" toPath="quotes" />}
       >
         <Table
           {...tableProps}
