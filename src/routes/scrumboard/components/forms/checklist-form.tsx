@@ -9,7 +9,7 @@ import { Button, Form } from "antd";
 import type { Task, TaskUpdateInput } from "@/graphql/schema.types";
 
 import { KANBAN_UPDATE_TASK_MUTATION } from "../../kanban/queries";
-import { AccordionHeaderSkeleton, ChecklistHeader, CheckListInput } from "../";
+import { AccordionHeaderSkeleton, ChecklistHeader, CheckListInput } from "..";
 
 type Props = {
   initialValues: {
