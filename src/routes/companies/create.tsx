@@ -158,7 +158,7 @@ export const CompanyCreatePage = ({ isOverModal }: Props) => {
           rules={[{ required: true }]}
         >
           <Select
-            placeholder="Please sales owner user"
+            placeholder="Please parent user"
             {...selectProps}
             options={
               queryResult.data?.data?.map((user) => ({

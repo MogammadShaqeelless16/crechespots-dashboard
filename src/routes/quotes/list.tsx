@@ -237,7 +237,7 @@ export const QuotesListPage: FC<PropsWithChildren> = ({ children }) => {
                 <FilterDropdown {...props}>
                   <Select
                     style={{ width: "200px" }}
-                    placeholder="Select Sales Owner"
+                    placeholder="Select Parent"
                     {...selectPropsUsers}
                   />
                 </FilterDropdown>

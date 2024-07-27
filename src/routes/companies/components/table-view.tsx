@@ -76,7 +76,7 @@ export const CompaniesTableView: FC<Props> = ({ tableProps, filters }) => {
       />
       <Table.Column<Company>
         dataIndex={["salesOwner", "id"]}
-        title="Sales Owner"
+        title="Parent"
         defaultFilteredValue={getDefaultFilter("salesOwner.id", filters)}
         filterDropdown={(props) => (
           <FilterDropdown {...props}>

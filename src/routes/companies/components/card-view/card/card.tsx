@@ -69,7 +69,7 @@ export const CompanyCard: FC<Props> = ({ company }) => {
               gap: "6px",
             }}
           >
-            <Text size="xs">Sales owner</Text>
+            <Text size="xs">Parent</Text>
             <Tooltip
               title={company.salesOwner?.name}
               key={company.salesOwner?.id}
