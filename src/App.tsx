@@ -66,6 +66,7 @@ import "@refinedev/antd/dist/reset.css";
 import "./styles/antd.css";
 import "./styles/fc.css";
 import "./styles/index.css";
+import { ChatPageWrapper } from "./routes/chat";
 
 const App: React.FC = () => {
   // This hook is used to automatically login the user.
@@ -115,6 +116,19 @@ const App: React.FC = () => {
                         <CalendarPageWrapper>
                           <Outlet />
                         </CalendarPageWrapper>
+                      }
+                    >
+                      <Route index element={null} />
+                      <Route path="show/:id" element={<CalendarShowPage />} />
+                      <Route path="edit/:id" element={<CalendarEditPage />} />
+                      <Route path="create" element={<CalendarCreatePage />} />
+                    </Route>
+                    <Route
+                      path="/chat"
+                      element={
+                        <ChatPageWrapper>
+                          <Outlet />
+                        </ChatPageWrapper>
                       }
                     >
                       <Route index element={null} />

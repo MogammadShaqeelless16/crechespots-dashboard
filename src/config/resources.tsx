@@ -8,6 +8,7 @@ import {
   ProjectOutlined,
   ShopOutlined,
   TeamOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 
 export const resources: IResourceItem[] = [
@@ -30,6 +31,18 @@ export const resources: IResourceItem[] = [
       label: "Calendar",
       // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
       icon: <CalendarOutlined />,
+    },
+  },
+  {
+    name: "chat",
+    list: "/chat",
+    create: "/calendar/create",
+    edit: "/calendar/edit/:id",
+    show: "/calendar/show/:id",
+    meta: {
+      label: "Ayoba Chat",
+      // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
+      icon: <MessageOutlined  />,
     },
   },
   {
