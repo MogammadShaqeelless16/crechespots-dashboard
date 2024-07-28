@@ -15,7 +15,7 @@ export const ChatPageWrapper: React.FC<React.PropsWithChildren> = ({
 
   return (
     <div className="page-container">
-      
+          <iframe src="https://ayoba-hackathon-socket.onrender.com/"></iframe>
     </div>
   );
 };
