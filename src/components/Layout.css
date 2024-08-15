@@ -1,0 +1,171 @@
+/* src/components/Layout.css */
+.layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .layout.light {
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  
+  .layout.dark {
+    background-color: #333;
+    color: #f4f4f4;
+  }
+  
+  .top-menu {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    background-color: #007bff;
+  }
+  
+  .menu-item {
+    color: white;
+    margin: 0 1rem;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .menu-item:hover {
+    text-decoration: underline;
+  }
+  
+  .dark-mode-toggle {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .top-menu {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--header-bg-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .menu-item {
+    margin: 0 1rem;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-left: 1rem;
+    cursor: pointer;
+  }
+
+  /* Layout.css */
+
+/* Layout.css */
+
+/* General layout styles */
+.layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .top-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Menu item styles */
+  .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .menu-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Icon styles within menu items */
+  .menu-item svg {
+    margin-right: 0.5rem;
+    color: inherit; /* Ensure the icon inherits the color of the menu item */
+  }
+  
+  /* Icon button styles */
+  .icon-buttons {
+    display: flex;
+    align-items: center;
+  }
+  
+  .icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    color: #000; /* Default color */
+    transition: color 0.3s ease;
+  }
+  
+  .icon-button:hover {
+    color: #007bff; /* Change color on hover */
+  }
+  
+  /* User profile styles */
+  .user-profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-avatar {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+  }
+  
+  /* Dark mode styles */
+  .dark-mode .top-menu {
+    background-color: #333;
+    color: #fff;
+  }
+  
+  .dark-mode .menu-item {
+    color: #fff;
+  }
+  
+  .dark-mode .menu-item:hover {
+    background-color: #444;
+  }
+  
+  .dark-mode .icon-button {
+    color: #fff; /* Change icon color for dark mode */
+  }
+  
+  .dark-mode .icon-button:hover {
+    color: #66b2ff; /* Change color on hover in dark mode */
+  }
+  

@@ -1,0 +1,41 @@
+.students-container {
+  padding: 20px;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.export-button,
+.add-student-button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.export-button {
+  background-color: #4CAF50; /* Green */
+}
+
+.add-student-button {
+  background-color: #008CBA; /* Blue */
+}
+
+.student-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.student-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.error-message {
+  color: red;
+}

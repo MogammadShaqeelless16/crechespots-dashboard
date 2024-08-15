@@ -1,0 +1,111 @@
+/* Dashboard.css */
+
+/* Container for the dashboard */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+  }
+  
+  /* Top counters section */
+  .dashboard-counters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  
+  .counter-item {
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    text-align: center;
+    margin: 0 0.5rem;
+  }
+  
+  .counter-item h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+  
+  .counter-item p {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  /* Main content section */
+  .dashboard-main {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  /* Creche list section */
+  .creche-list {
+    flex: 1;
+    margin-right: 1rem;
+  }
+  
+  .creche-list h2 {
+    margin-bottom: 1rem;
+  }
+  
+  .creche-box {
+    display: inline-block;
+    width: calc(33.333% - 1rem); /* 3 items per row with spacing */
+    padding-right: 20px;
+    margin-bottom: 1rem;
+    vertical-align: top;
+  }
+  
+  .creche-card {
+    display: block;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .creche-card-image {
+    width: 100%;
+    height: auto;
+  }
+  
+  .creche-card-content {
+    padding: 1rem;
+  }
+  
+  .creche-card-title {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+  
+  /* Upcoming events section */
+  .upcoming-events {
+    flex: 1;
+    margin-left: 1rem;
+  }
+  
+  .upcoming-events h2 {
+    margin-bottom: 1rem;
+  }
+  
+  .event-item {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+  }
+  
+  .event-item h3 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  
+  .event-item p {
+    margin: 0.5rem 0 0;
+    color: #666;
+  }
+  

@@ -1,0 +1,33 @@
+/* src/components/Teachers.css */
+.teachers {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .teachers-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .teacher-card {
+    flex: 1 1 calc(33.333% - 1rem);
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .teacher-card h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  
+  .error {
+    color: red;
+    font-weight: bold;
+  }
+  
