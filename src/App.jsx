@@ -6,7 +6,8 @@ import Profile from './components/Profile';
 import Staff from './components/Staff/Staff';
 import CrecheDetails from './components/CrecheDetails';
 import About from './components/About';
-import Students from './components/Student/Students'; // Import the Students component
+import Students from './components/Student/Students'; 
+import Applications from './components/Application/Application'; // Import the Applications component
 import Layout from './components/Layout';
 
 function App() {
@@ -30,7 +31,8 @@ function App() {
           <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
           <Route path="/staff" element={<ProtectedRoute element={<Staff />} />} />
           <Route path="/creche/:id" element={<ProtectedRoute element={<CrecheDetails />} />} />
-          <Route path="/students" element={<ProtectedRoute element={<Students />} />} /> {/* Add Students route */}
+          <Route path="/students" element={<ProtectedRoute element={<Students />} />} /> {/* Students route */}
+          <Route path="/applications" element={<ProtectedRoute element={<Applications />} />} /> {/* Applications route */}
           {/* Redirect unknown routes to home */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

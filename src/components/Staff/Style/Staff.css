@@ -8,10 +8,6 @@
   margin-bottom: 20px;
 }
 
-.export-button, .add-staff-button {
-  padding: 10px 20px;
-  margin: 0 10px;
-}
 
 .staff-list {
   display: flex;

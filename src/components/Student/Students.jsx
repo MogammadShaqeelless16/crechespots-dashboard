@@ -13,6 +13,7 @@ const Students = () => {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showBroadcast, setShowBroadcast] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -107,19 +108,38 @@ const Students = () => {
     setShowBroadcast(false);
   };
 
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    const filtered = students.filter(student =>
+      student.title.rendered.toLowerCase().includes(query) ||
+      (student.related_creche && student.related_creche.toLowerCase().includes(query))
+    );
+    setFilteredStudents(filtered);
+  };
+
   return (
     <div className="students-container">
       <div className="header-container">
         <h1>My Students</h1>
-        <button onClick={exportToExcel} className="export-button">
-          <i className="fas fa-file-export"></i> Export to Excel
-        </button>
-        <button onClick={handleAddStudentClick} className="add-student-button">
-          <i className="fas fa-user-plus"></i> Add Student
-        </button>
-        <button onClick={handleBroadcastClick} className="broadcast-button">
-          <i className="fas fa-broadcast-tower"></i> Broadcast
-        </button>
+        <div className="sub-header-container">
+          <input
+            type="text"
+            placeholder="Search students..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="search-bar"
+          />
+          <button onClick={exportToExcel} className="export-button">
+            <i className="fas fa-file-export"></i> Export to Excel
+          </button>
+          <button onClick={handleAddStudentClick} className="add-student-button">
+            <i className="fas fa-user-plus"></i> Add Student
+          </button>
+          <button onClick={handleBroadcastClick} className="broadcast-button">
+            <i className="fas fa-broadcast-tower"></i> Broadcast
+          </button>
+        </div>
       </div>
       {error && <p className="error-message">{error}</p>}
       {filteredStudents.length > 0 ? (

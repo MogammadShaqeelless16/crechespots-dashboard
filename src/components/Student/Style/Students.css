@@ -1,91 +1,50 @@
-.students-container {
-  padding: 20px;
-}
-
 .header-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.sub-header-container {
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.search-bar {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 16px;
 }
 
 .export-button,
-.add-student-button {
-  margin-left: 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-}
-
-.export-button {
-  background-color: #4CAF50; /* Green */
-}
-
-.add-student-button {
-  background-color: #008CBA; /* Blue */
-}
-
-.student-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.student-item {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.error-message {
-  color: red;
-}
-
-.header-container button {
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-  padding: 10px;
-}
-
-.header-container button i {
-  margin-right: 5px;
-}
-
+.add-student-button,
 .broadcast-button {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.header-container {
-  display: flex;
-  gap: 10px;
-}
-
-.header-container button {
-  display: flex;
-  align-items: center;
-  padding: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
   border: none;
-  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
   font-size: 16px;
   cursor: pointer;
 }
 
-.header-container button i {
-  margin-right: 5px;
-}
-
 .export-button {
-  background-color: #4CAF50;
-  color: white;
+  background-color: #4CAF50; /* Change color as needed */
 }
 
 .add-student-button {
-  background-color: #008CBA;
-  color: white;
+  background-color: #007BFF; /* Change color as needed */
 }
 
 .broadcast-button {
-  background-color: #f44336;
-  color: white;
+  background-color: #FF5733; /* Change color as needed */
+}
+
+.export-button i,
+.add-student-button i,
+.broadcast-button i {
+  margin-right: 5px;
 }

@@ -80,7 +80,7 @@ const Dashboard = () => {
         setStaffCount(filteredStaff.length);
 
         // Fetch application counts
-        const applicationResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/applications', {
+        const applicationResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/application', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
