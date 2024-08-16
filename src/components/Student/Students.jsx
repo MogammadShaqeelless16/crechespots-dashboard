@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
-import AddStudent from './AddStudent'; // Import the AddStudent component
-import StudentDetails from './StudentDetails'; // Import the StudentDetails component
-import './Style/Students.css';
+import AddStudent from './AddStudent';
+import StudentDetails from './StudentDetails';
+import BroadcastDetails from './BroadcastDetails';
+import './Style/Students.css'; // Ensure this file includes styles for icons
 
 const Students = () => {
   const [students, setStudents] = useState([]);
@@ -11,6 +12,7 @@ const Students = () => {
   const [error, setError] = useState('');
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showBroadcast, setShowBroadcast] = useState(false);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -21,22 +23,15 @@ const Students = () => {
       }
 
       try {
-        // Fetch the user's profile to get the user's name
         const profileResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const userName = profileResponse.data.name;
 
-        // Fetch creches assigned to this user
         const crecheResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/creche', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Create a mapping of creche IDs to titles
         const crecheTitleMap = crecheResponse.data.reduce((map, creche) => {
           if (creche.assigned_user && creche.assigned_user === userName) {
             map[creche.id] = creche.title.rendered;
@@ -44,20 +39,16 @@ const Students = () => {
           return map;
         }, {});
 
-        // Fetch students
         const studentResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/student', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Filter students based on related_creche title matching the user's creches
         const filtered = studentResponse.data.filter(student =>
           Object.values(crecheTitleMap).includes(student.related_creche)
         );
 
-        setStudents(studentResponse.data); // Set all students
-        setFilteredStudents(filtered); // Set filtered students
+        setStudents(studentResponse.data);
+        setFilteredStudents(filtered);
 
       } catch (err) {
         console.error('Fetch Error:', err);
@@ -68,7 +59,6 @@ const Students = () => {
     fetchStudents();
   }, []);
 
-  // Export students data to Excel
   const exportToExcel = () => {
     if (filteredStudents.length === 0) {
       alert('No data to export');
@@ -77,7 +67,7 @@ const Students = () => {
 
     const ws = XLSX.utils.json_to_sheet(filteredStudents.map(student => ({
       FullName: student.title.rendered,
-      Creche: student.related_creche || 'N/A', // Adjust based on actual data
+      Creche: student.related_creche || 'N/A',
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Students');
@@ -94,7 +84,6 @@ const Students = () => {
   };
 
   const handleStudentAdded = () => {
-    // Refresh the student list when a student is added
     fetchStudents();
   };
 
@@ -107,16 +96,30 @@ const Students = () => {
   };
 
   const handleStudentUpdated = () => {
-    // Refresh the student list when a student is updated
     fetchStudents();
+  };
+
+  const handleBroadcastClick = () => {
+    setShowBroadcast(true);
+  };
+
+  const handleCloseBroadcast = () => {
+    setShowBroadcast(false);
   };
 
   return (
     <div className="students-container">
       <div className="header-container">
         <h1>My Students</h1>
-        <button onClick={exportToExcel} className="export-button">Export to Excel</button>
-        <button onClick={handleAddStudentClick} className="add-student-button">Add Student</button>
+        <button onClick={exportToExcel} className="export-button">
+          <i className="fas fa-file-export"></i> Export to Excel
+        </button>
+        <button onClick={handleAddStudentClick} className="add-student-button">
+          <i className="fas fa-user-plus"></i> Add Student
+        </button>
+        <button onClick={handleBroadcastClick} className="broadcast-button">
+          <i className="fas fa-broadcast-tower"></i> Broadcast
+        </button>
       </div>
       {error && <p className="error-message">{error}</p>}
       {filteredStudents.length > 0 ? (
@@ -140,6 +143,9 @@ const Students = () => {
           onClose={handleCloseStudentDetails}
           onStudentUpdated={handleStudentUpdated}
         />
+      )}
+      {showBroadcast && (
+        <BroadcastDetails onClose={handleCloseBroadcast} />
       )}
     </div>
   );

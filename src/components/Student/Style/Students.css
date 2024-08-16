@@ -39,3 +39,53 @@
 .error-message {
   color: red;
 }
+
+.header-container button {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  padding: 10px;
+}
+
+.header-container button i {
+  margin-right: 5px;
+}
+
+.broadcast-button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.header-container {
+  display: flex;
+  gap: 10px;
+}
+
+.header-container button {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.header-container button i {
+  margin-right: 5px;
+}
+
+.export-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.add-student-button {
+  background-color: #008CBA;
+  color: white;
+}
+
+.broadcast-button {
+  background-color: #f44336;
+  color: white;
+}
