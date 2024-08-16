@@ -1,0 +1,42 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .add-staff-modal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-staff-modal h2 {
+    margin-top: 0;
+  }
+  
+  .add-staff-modal form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-staff-modal label {
+    margin-bottom: 10px;
+  }
+  
+  .add-staff-modal input {
+    padding: 8px;
+    margin-top: 5px;
+  }
+  
+  .add-staff-modal button {
+    margin-top: 10px;
+  }
+  

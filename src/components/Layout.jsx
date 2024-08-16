@@ -26,9 +26,17 @@ const Layout = ({ children }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setUserProfile(response.data);
-        setIsLoggedIn(true);
+
+        // Ensure the response contains the expected data
+        if (response.data && response.data.avatar_urls) {
+          setUserProfile(response.data);
+          setIsLoggedIn(true);
+        } else {
+          setUserProfile(null);
+          setIsLoggedIn(false);
+        }
       } catch (error) {
+        console.error('Error fetching user profile:', error);
         clearToken();
         setIsLoggedIn(false);
         navigate('/login'); // Use navigate instead of history.push
@@ -74,9 +82,9 @@ const Layout = ({ children }) => {
               <FontAwesomeIcon icon={faHome} />
               Dashboard
             </Link>
-            <Link to="/teachers" className="menu-item">
+            <Link to="/Staff" className="menu-item">
               <FontAwesomeIcon icon={faChalkboardTeacher} />
-              Teachers
+              Staff
             </Link>
             <Link to="/applications" className="menu-item">
               <FontAwesomeIcon icon={faFileAlt} />
@@ -98,10 +106,10 @@ const Layout = ({ children }) => {
                 <FontAwesomeIcon icon={faSignOutAlt} />
               </button>
             </div>
-            {userProfile && (
+            {userProfile && userProfile.avatar_urls && (
               <Link to="/profile" className="user-profile">
                 <img
-                  src={userProfile.avatar_urls[96]} // Adjust size as needed
+                  src={userProfile.avatar_urls[96] || '/default-avatar.png'} // Default image if not available
                   alt="User Profile"
                   className="user-avatar"
                 />
