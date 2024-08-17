@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const CrecheList = ({ creches }) => {
   return (
     <div className="creche-list">
-      <h2>My Creche</h2>
+      <h2>My Centre</h2>
       {creches.length > 0 ? (
         creches.map((creche) => (
           <div key={creche.id} className="creche-box">

@@ -6,6 +6,10 @@
   position: relative;
 }
 
+.applications-container{
+  padding: 20px;
+}
+
 .application-item p {
   margin: 5px 0;
 }

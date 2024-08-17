@@ -23,6 +23,11 @@
   cursor: pointer;
 }
 
+.staff-grid {
+  display: flex;
+  margin-top: 20px;
+}
+
 .staff-card h2 {
   margin-top: 0;
 }

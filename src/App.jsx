@@ -6,9 +6,10 @@ import Profile from './components/Profile';
 import Staff from './components/Staff/Staff';
 import CrecheDetails from './components/CrecheDetails';
 import About from './components/About';
-import Students from './components/Student/Students'; 
-import Applications from './components/Application/Application'; // Import the Applications component
+import Students from './components/Student/Students';
+import Applications from './components/Application/Application';
 import Layout from './components/Layout';
+import { DataProvider } from './Context/DataContext'; // Import the DataProvider
 
 function App() {
   // Helper function to protect routes
@@ -22,22 +23,24 @@ function App() {
   };
 
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-          <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
-          <Route path="/staff" element={<ProtectedRoute element={<Staff />} />} />
-          <Route path="/creche/:id" element={<ProtectedRoute element={<CrecheDetails />} />} />
-          <Route path="/students" element={<ProtectedRoute element={<Students />} />} /> {/* Students route */}
-          <Route path="/applications" element={<ProtectedRoute element={<Applications />} />} /> {/* Applications route */}
-          {/* Redirect unknown routes to home */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <DataProvider> {/* Wrap your app in DataProvider */}
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+            <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
+            <Route path="/staff" element={<ProtectedRoute element={<Staff />} />} />
+            <Route path="/creche/:id" element={<ProtectedRoute element={<CrecheDetails />} />} />
+            <Route path="/students" element={<ProtectedRoute element={<Students />} />} />
+            <Route path="/applications" element={<ProtectedRoute element={<Applications />} />} />
+            {/* Redirect unknown routes to home */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </DataProvider>
   );
 }
 

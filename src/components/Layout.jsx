@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { clearToken } from '../utils/auth'; // Adjust the path as necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoon, faSun, faSignOutAlt, faHome, faChalkboardTeacher, faFileAlt, faUsers, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faMoon, faSun, faSignOutAlt, faHome, faChalkboardTeacher, faFileAlt, faUsers, faCalendar, faQuestionCircle , faReceipt } from '@fortawesome/free-solid-svg-icons';
 import './Layout.css';
 
 const Layout = ({ children }) => {
@@ -97,6 +97,14 @@ const Layout = ({ children }) => {
             <Link to="/events" className="menu-item">
               <FontAwesomeIcon icon={faCalendar} />
               Events
+            </Link>
+            <Link to="/events" className="menu-item">
+              <FontAwesomeIcon icon={faReceipt} />
+              Reports
+            </Link>
+            <Link to="/events" className="menu-item">
+              <FontAwesomeIcon icon={faQuestionCircle} />
+              Help
             </Link>
             <div className="icon-buttons">
               <button onClick={toggleDarkMode} className="icon-button">

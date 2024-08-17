@@ -14,6 +14,8 @@ const Students = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState(null);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -118,6 +120,33 @@ const Students = () => {
     setFilteredStudents(filtered);
   };
 
+  const handleDeleteClick = (student) => {
+    setStudentToDelete(student);
+    setShowDeleteOverlay(true);
+  };
+
+  const confirmDelete = async () => {
+    if (studentToDelete) {
+      try {
+        const token = localStorage.getItem('jwtToken');
+        await axios.delete(`https://shaqeel.wordifysites.com/wp-json/wp/v2/student/${studentToDelete.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStudents(students.filter(s => s.id !== studentToDelete.id));
+        setFilteredStudents(filteredStudents.filter(s => s.id !== studentToDelete.id));
+        setShowDeleteOverlay(false);
+      } catch (err) {
+        console.error('Delete Error:', err);
+        setError('Failed to delete student');
+      }
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteOverlay(false);
+    setStudentToDelete(null);
+  };
+
   return (
     <div className="students-container">
       <div className="header-container">
@@ -143,14 +172,16 @@ const Students = () => {
       </div>
       {error && <p className="error-message">{error}</p>}
       {filteredStudents.length > 0 ? (
-        <ul className="student-list">
+        <div className="student-grid">
           {filteredStudents.map(student => (
-            <li key={student.id} className="student-item" onClick={() => handleStudentClick(student)}>
+            <div key={student.id} className="student-card">
               <h3>{student.title.rendered}</h3>
               <p>Creche: {student.related_creche || 'Unknown'}</p>
-            </li>
+              <button onClick={() => handleStudentClick(student)}>View Details</button>
+              <button onClick={() => handleDeleteClick(student)} className="delete-button">Delete Student</button>
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
         <p>No students found.</p>
       )}
@@ -166,6 +197,15 @@ const Students = () => {
       )}
       {showBroadcast && (
         <BroadcastDetails onClose={handleCloseBroadcast} />
+      )}
+      {showDeleteOverlay && (
+        <div className="overlay">
+          <div className="warning-overlay">
+            <p>Are you sure you want to delete {studentToDelete?.title.rendered}?</p>
+            <button onClick={confirmDelete} className="confirm-delete-button">Yes, Delete</button>
+            <button onClick={cancelDelete} className="cancel-delete-button">Cancel</button>
+          </div>
+        </div>
       )}
     </div>
   );
