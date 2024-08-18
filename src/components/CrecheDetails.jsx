@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import Quill's styles
 import './CrecheDetails.css';
+import SplashScreen from './SplashScreen/SplashScreen';
 
 const CrecheDetails = () => {
   const { id } = useParams();
@@ -314,7 +315,7 @@ const CrecheDetails = () => {
           </div>
         </div>
       ) : (
-        <p>Loading...</p>
+        <SplashScreen/>
       )}
     </div>
   );

@@ -6,6 +6,8 @@ import './Login.css'; // Ensure this CSS file includes styles for layout
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate(); // Hook for navigation
 
@@ -14,7 +16,7 @@ const Login = () => {
     try {
       const response = await axios.post('https://shaqeel.wordifysites.com/wp-json/jwt-auth/v1/token', {
         username,
-        password
+        password,
       });
       // Store token in localStorage
       localStorage.setItem('jwtToken', response.data.data.token); // Adjust based on actual API response
@@ -25,12 +27,19 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    navigate('/forgot-password'); // Navigate to the forgot password page
+  };
+
+  const handleSignup = () => {
+    navigate('/signup'); // Navigate to the signup page
+  };
+
   return (
     <div className="login-container">
-
-      <div className="welcome-section">      
+      <div className="welcome-section">
         <div className="logo-container">
-        <img src="/logo.gif" alt="Logo" className="logo-image" />
+          <img src="/logo.gif" alt="Logo" className="logo-image" />
         </div>
         <h1>Welcome to Creche Spots</h1>
         <p>
@@ -55,8 +64,36 @@ const Login = () => {
             placeholder="Password"
             required
           />
-          <button type="submit">Login</button>
+          <div className="checkbox-container">
+            <label>
+              <input
+                type="checkbox"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+              />
+              I accept the <a href="/terms">terms and conditions</a>
+            </label>
+          </div>
+          <div className="checkbox-container">
+            <label>
+              <input
+                type="checkbox"
+                checked={acceptPrivacy}
+                onChange={(e) => setAcceptPrivacy(e.target.checked)}
+              />
+              I accept the <a href="/privacy">privacy policy</a>
+            </label>
+          </div>
+          <button type="submit" disabled={!acceptTerms || !acceptPrivacy}>
+            Login
+          </button>
         </form>
+        <button className="forgot-password-button" onClick={handleForgotPassword}>
+          <i className="fas fa-key"></i> Forgot your password?
+        </button>
+        <button className="signup-button" onClick={handleSignup}>
+          <i className="fas fa-user-plus"></i> Don't have an account?
+        </button>
         {error && <p className="error-message">{error}</p>}
       </div>
     </div>

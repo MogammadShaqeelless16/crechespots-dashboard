@@ -1,71 +1,76 @@
 /* Login.css */
 .login-container {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    padding-top: 30vh;
-    padding-right: 20vh;
-    padding-left: 20vh;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  padding-top: 30vh;
+  padding-right: 20vh;
+  padding-left: 20vh;
+}
 
-  }
-  
-  .welcome-section {
-    flex: 1;
-    padding: 20px;
-    border-radius: 8px;
-    margin-right: 20px;
-  }
-  
-  .welcome-section h1 {
-    margin-top: 0;
-  }
-  
-  .login-form {
-    flex: 1;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .login-form form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .login-form input {
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .login-form button {
-    padding: 10px;
-    background-color: #007bff;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .login-form button:hover {
-    background-color: #0056b3;
-  }
-  
-  .login-form p {
-    color: red;
-    margin-top: 10px;
-  }
+.welcome-section {
+  flex: 1;
+  padding: 20px;
+  border-radius: 8px;
+  margin-right: 20px;
+}
 
-  .logo-container {
-    margin-bottom: 1.5rem; /* Space between logo and the heading */
-    
-    padding-left:25vh;
-  }
-  
-  .logo-image {
-    max-width: 150px; /* Adjust size as needed */
-    height: auto;
-  }
-  
-  
+.welcome-section h1 {
+  margin-top: 0;
+}
+
+.login-form {
+  flex: 1;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form input {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.checkbox-container {
+  margin-bottom: 10px;
+}
+
+.login-form button {
+  padding: 10px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-form button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.login-form button:hover:enabled {
+  background-color: #0056b3;
+}
+
+.login-form p {
+  color: red;
+  margin-top: 10px;
+}
+
+.logo-container {
+  margin-bottom: 1.5rem; /* Space between logo and the heading */
+  padding-left: 25vh;
+}
+
+.logo-image {
+  max-width: 150px; /* Adjust size as needed */
+  height: auto;
+}
