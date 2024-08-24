@@ -1,0 +1,24 @@
+/* CrecheWishlist.css */
+.wishlist-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.new-post-form {
+    margin-bottom: 20px;
+}
+
+.posts-list {
+    margin-top: 20px;
+}
+
+.post-card {
+    margin-bottom: 20px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 20px;
+}

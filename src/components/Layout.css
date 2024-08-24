@@ -9,6 +9,10 @@
   .layout.light {
     background-color: #f4f4f4;
     color: #333;
+    background-image: url(https://slidescorner.com/wp-content/uploads/2022/09/01-Heidi-Pastel-Abstract-Organic-Shapes-Background-by-SlidesCorner.jpg);
+    background-image: no repeating-linear-gradient(45deg, black, transparent 100px);
+    background-repeat: no-repeat;
+    background-size: cover;
   }
   
   .layout.dark {

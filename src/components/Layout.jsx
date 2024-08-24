@@ -94,9 +94,9 @@ const Layout = ({ children }) => {
               <FontAwesomeIcon icon={faUsers} />
               Students
             </Link>
-            <Link to="/events" className="menu-item">
+            <Link to="/crecheWishlist" className="menu-item">
               <FontAwesomeIcon icon={faCalendar} />
-              Events
+              Wish List
             </Link>
             <Link to="/reports" className="menu-item">
               <FontAwesomeIcon icon={faReceipt} />
