@@ -1,19 +1,114 @@
-/* src/components/Profile.css */
 .profile {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-details {
+  text-align: left;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* Profile picture styling */
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 2px solid #ddd;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Form styling */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-group input[type="url"] {
+  display: block;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+button[type="submit"],
+button[type="button"] {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+button[type="button"] {
+  background-color: #6c757d;
+}
+
+button[type="submit"]:hover,
+button[type="button"]:hover {
+  background-color: #0056b3;
+}
+
+button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+button {
+  margin-top: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .profile {
+    padding: 1rem;
   }
-  
-  .profile-details {
-    text-align: left;
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 0.9rem;
   }
-  
-  .error {
-    color: red;
-    font-weight: bold;
+
+  button[type="submit"],
+  button[type="button"] {
+    width: 100%;
+    margin-top: 0.5rem;
   }
-  
+}

@@ -8,7 +8,6 @@
     justify-content: flex-end;
     align-items: flex-start;
     transition: transform 0.3s ease-in-out;
-    transform: translateX(100%);
     z-index: 1000; /* Ensure it sits on top of other content */
   }
   

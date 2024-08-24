@@ -98,11 +98,11 @@ const Layout = ({ children }) => {
               <FontAwesomeIcon icon={faCalendar} />
               Events
             </Link>
-            <Link to="/events" className="menu-item">
+            <Link to="/reports" className="menu-item">
               <FontAwesomeIcon icon={faReceipt} />
               Reports
             </Link>
-            <Link to="/events" className="menu-item">
+            <Link to="/help" className="menu-item">
               <FontAwesomeIcon icon={faQuestionCircle} />
               Help
             </Link>

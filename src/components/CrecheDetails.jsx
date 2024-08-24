@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import Quill's styles
+import 'react-quill/dist/quill.snow.css';
 import './CrecheDetails.css';
 import SplashScreen from './SplashScreen/SplashScreen';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faSave, faTimes, faGlobe, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 const CrecheDetails = () => {
   const { id } = useParams();
@@ -23,7 +25,8 @@ const CrecheDetails = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        const postSlug = response.data.slug; // Getting the post slug
+
+        const postSlug = response.data.slug;
         setCreche(response.data);
         setFormData({
           title: response.data.title.rendered || '',
@@ -41,7 +44,7 @@ const CrecheDetails = () => {
           longitude: response.data.longitude || '',
           facebook: response.data.facebook || '',
           instagram: response.data.instagram || '',
-          postSlug: postSlug // Save the slug for later use
+          postSlug: postSlug
         });
       } catch (err) {
         setError(err.response ? err.response.data.message : 'Failed to fetch creche details');
@@ -69,6 +72,9 @@ const CrecheDetails = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('jwtToken');
+    setError('');
+    setSuccess('');
+    
     try {
       const response = await axios.put(`https://shaqeel.wordifysites.com/wp-json/wp/v2/creche/${id}`, {
         ...formData,
@@ -79,6 +85,7 @@ const CrecheDetails = () => {
           'Content-Type': 'application/json'
         },
       });
+      
       setCreche(response.data);
       setSuccess('Creche details updated successfully!');
       setEditable(false);
@@ -109,8 +116,13 @@ const CrecheDetails = () => {
       longitude: creche.longitude || '',
       facebook: creche.facebook || '',
       instagram: creche.instagram || '',
-      postSlug: creche.slug || '' // Set the slug from the fetched data
+      postSlug: creche.slug || ''
     });
+  };
+
+  const handleContact = () => {
+    const subject = `Inquiry about ${formData.title}`;
+    window.location.href = `mailto:support@crechespots.co.za?subject=${encodeURIComponent(subject)}`;
   };
 
   return (
@@ -280,42 +292,49 @@ const CrecheDetails = () => {
                   readOnly={!editable}
                 />
               </div>
+              {editable && (
+                <div className="form-group">
+                  <button type="submit">
+                    <FontAwesomeIcon icon={faSave} /> Save
+                  </button>
+                  <button type="button" onClick={handleCancel}>
+                    <FontAwesomeIcon icon={faTimes} /> Cancel
+                  </button>
+                </div>
+              )}
             </form>
           </div>
-          <div className="action-buttons-container">
-            <div className="action-buttons">
-              {editable ? (
-                <>
-                  <button type="button" onClick={handleSave}>Save</button>
-                  <button type="button" onClick={handleCancel}>Cancel</button>
-                </>
-              ) : (
-                <>
-                  <button type="button" onClick={handleEdit}>Edit</button>
-                  <button
-                    type="button"
-                    onClick={() => window.open(`https://shaqeel.wordifysites.com/${formData.postSlug}`, '_blank')}
-                  >
-                    Website
-                  </button>
-                  <button type="button" onClick={() => window.open(`mailto:${formData.email}`)}>Contact</button>
-                </>
-              )}
-            </div>
-            <div className="images-container">
-              <div className="logo-container">
-                <h3>Logo</h3>
-                <img src={formData.logo} alt="Logo" className="logo-image" />
-                <p>Heading Image</p>
+          {!editable && (
+            <div className="action-buttons-container">
+              <div className="action-buttons">
+                <button type="button" onClick={handleEdit}>
+                  <FontAwesomeIcon icon={faEdit} /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.open(`https://shaqeel.wordifysites.com/${formData.postSlug}`, '_blank')}
+                >
+                  <FontAwesomeIcon icon={faGlobe} /> Website
+                </button>
+                <button type="button" onClick={handleContact}>
+                  <FontAwesomeIcon icon={faEnvelope} /> Contact
+                </button>
               </div>
-              <div className="header-image-container">
-                <img src={formData.headerImage} alt="Header" className="header-image" />
+              <div className="images-container">
+                <div className="logo-container">
+                  <h3>Logo</h3>
+                  <img src={formData.logo} alt="Logo" className="logo-image" />
+                  <p>Heading Image</p>
+                </div>
+                <div className="header-image-container">
+                  <img src={formData.headerImage} alt="Header" className="header-image" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
-        <SplashScreen/>
+        <SplashScreen />
       )}
     </div>
   );

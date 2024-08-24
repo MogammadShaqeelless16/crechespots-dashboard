@@ -9,6 +9,10 @@ import About from './components/About';
 import Students from './components/Student/Students';
 import Applications from './components/Application/Application';
 import Layout from './components/Layout';
+import Events from './components/Events/event';
+import Report from './components/Reports/report';
+import Help from './components/help/help';
+import InvoiceGenerator from './components/Reports/InvoiceGenerator';
 import { DataProvider } from './Context/DataContext'; // Import the DataProvider
 
 function App() {
@@ -35,6 +39,10 @@ function App() {
             <Route path="/creche/:id" element={<ProtectedRoute element={<CrecheDetails />} />} />
             <Route path="/students" element={<ProtectedRoute element={<Students />} />} />
             <Route path="/applications" element={<ProtectedRoute element={<Applications />} />} />
+            <Route path="/reports" element={<ProtectedRoute element={<Report />} />} />
+            <Route path="/invoice-generator" element={<InvoiceGenerator />} />
+            <Route path="/events" element={<ProtectedRoute element={<Events />} />} />
+            <Route path="/help" element={<ProtectedRoute element={<Help />} />} />
             {/* Redirect unknown routes to home */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
