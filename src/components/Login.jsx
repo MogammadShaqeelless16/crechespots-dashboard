@@ -71,7 +71,7 @@ const Login = () => {
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
               />
-              I accept the <a href="/terms">terms and conditions</a>
+              I accept the <a href="https://crechespots.org.za/terms-and-conditions/" target="_blank">terms and conditions</a>
             </label>
           </div>
           <div className="checkbox-container">
@@ -81,7 +81,7 @@ const Login = () => {
                 checked={acceptPrivacy}
                 onChange={(e) => setAcceptPrivacy(e.target.checked)}
               />
-              I accept the <a href="/privacy">privacy policy</a>
+              I accept the <a href="https://crechespots.org.za/privacy-policy/" target="_blank" >privacy policy</a>
             </label>
           </div>
           <button type="submit" disabled={!acceptTerms || !acceptPrivacy}>
