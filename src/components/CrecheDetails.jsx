@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './CrecheDetails.css';
-import SplashScreen from './SplashScreen/SplashScreen';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faTimes, faGlobe, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
@@ -129,7 +128,11 @@ const CrecheDetails = () => {
     <div className="creche-details">
       {error && <p className="error">{error}</p>}
       {success && <p className="success">{success}</p>}
-      {creche ? (
+      {creche === null ? (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+        </div>
+      ) : (
         <div className="details-container">
           <div className="form-container">
             <h1>{formData.title}</h1>
@@ -333,8 +336,6 @@ const CrecheDetails = () => {
             </div>
           )}
         </div>
-      ) : (
-        <SplashScreen />
       )}
     </div>
   );
