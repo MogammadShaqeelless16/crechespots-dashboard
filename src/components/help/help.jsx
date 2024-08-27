@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './style/Help.css'; // Ensure you have this CSS file for styling
+import './style/help.css'; // Ensure you have this CSS file for styling
 
 const Help = () => {
     const [searchTerm, setSearchTerm] = useState('');
