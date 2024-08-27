@@ -3,15 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import supabase from '../supabaseOperations/supabaseClient'; // Ensure the path is correct
 import { clearToken } from '../utils/auth'; // Adjust the path as necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoon, faSun, faSignOutAlt, faHome, faChalkboardTeacher, faFileAlt, faUsers, faCalendar, faQuestionCircle, faReceipt, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faMoon, faSun, faSignOutAlt, faHome, faChalkboardTeacher, faFileAlt, faUsers, faCalendar, faQuestionCircle, faReceipt, faLock, faCogs, faDatabase, faTicketAlt, faBook, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import './Layout.css';
 
 const Layout = ({ children }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
-  const [userRole, setUserRole] = useState(''); // Added state for user role
-  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false); // State for dropdown menu visibility
+  const [userRole, setUserRole] = useState('');
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,10 +29,9 @@ const Layout = ({ children }) => {
         setUserProfile(user);
         setIsLoggedIn(true);
 
-        // Fetch user profile with role
         const { data: profileData, error: profileError } = await supabase
           .from('users')
-          .select('roles(role_name)')
+          .select('roles(role_name), profile_picture_url')
           .eq('id', user.id)
           .single();
 
@@ -40,6 +39,10 @@ const Layout = ({ children }) => {
           console.error('Error fetching profile data:', profileError.message);
         } else {
           setUserRole(profileData?.roles?.role_name || '');
+          setUserProfile(prevProfile => ({
+            ...prevProfile,
+            profile_picture_url: profileData?.profile_picture_url || prevProfile.profile_picture_url
+          }));
         }
       } else {
         setUserProfile(null);
@@ -70,7 +73,7 @@ const Layout = ({ children }) => {
 
     clearToken();
     setIsLoggedIn(false);
-    navigate('/'); // Redirect to home or login page
+    navigate('/');
   };
 
   const handleMouseEnter = () => setIsAdminMenuOpen(true);
@@ -132,8 +135,38 @@ const Layout = ({ children }) => {
                 </Link>
                 {isAdminMenuOpen && (
                   <div className="admin-menu-dropdown">
-                    <Link to="/usermanagement" className="dropdown-item">User Management</Link>
-                    <Link to="/crechemanagement" className="dropdown-item">Creche Management</Link>
+                    <Link to="/usermanagement" className="dropdown-item">
+                      <FontAwesomeIcon icon={faUsers} />
+                      User Management
+                    </Link>
+                    <Link to="/crechemanagement" className="dropdown-item">
+                      <FontAwesomeIcon icon={faCogs} />
+                      Creche Management
+                    </Link>
+                    <Link to="/reports" className="dropdown-item">
+                      <FontAwesomeIcon icon={faReceipt} />
+                      Reports and Analytics
+                    </Link>
+                    <Link to="/contentmanagement" className="dropdown-item">
+                      <FontAwesomeIcon icon={faBook} />
+                      Content Management
+                    </Link>
+                    <Link to="/systemsettings" className="dropdown-item">
+                      <FontAwesomeIcon icon={faCogs} />
+                      System Settings
+                    </Link>
+                    <Link to="/integrations" className="dropdown-item">
+                      <FontAwesomeIcon icon={faDatabase} />
+                      Integrations
+                    </Link>
+                    <Link to="/supporttickets" className="dropdown-item">
+                      <FontAwesomeIcon icon={faTicketAlt} />
+                      Support Tickets
+                    </Link>
+                    <Link to="/auditlogs" className="dropdown-item">
+                      <FontAwesomeIcon icon={faShieldAlt} />
+                      Audit Logs
+                    </Link>
                   </div>
                 )}
               </div>
@@ -149,7 +182,7 @@ const Layout = ({ children }) => {
             {userProfile && (
               <Link to="/profile" className="user-profile">
                 <img
-                  src={userProfile.user_metadata.avatar_url || '/default-avatar.png'} // Default image if not available
+                  src={userProfile.profile_picture_url || '/default-avatar.png'}
                   alt="User Profile"
                   className="user-avatar"
                 />

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../supabaseOperations/supabaseClient'; // Ensure the path is correct
+import ForgotPassword from './ForgotPassword';
 import './Login.css';
 
 const Login = () => {
