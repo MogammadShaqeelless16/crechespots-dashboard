@@ -1,4 +1,3 @@
-// src/Applications.js
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseOperations/supabaseClient';
 import ApplicationDetails from './ApplicationDetails';
@@ -8,38 +7,14 @@ import './Style/Applications.css';
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState([]);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showAddApplication, setShowAddApplication] = useState(false);
   const [error, setError] = useState('');
-  const [creches, setCreches] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
   const [applicationToDelete, setApplicationToDelete] = useState(null);
   const [showBroadcast, setShowBroadcast] = useState(false);
-
-  useEffect(() => {
-    const fetchCreches = async () => {
-      try {
-        const { data: creches, error } = await supabase
-          .from('creches')
-          .select('*');
-          
-        if (error) throw error;
-
-        // Assuming the 'assigned_user' column exists and is used for filtering
-        const userName = 'YourUserName'; // Retrieve this value as needed
-        const userCreches = creches.filter(creche => creche.assigned_user === userName);
-
-        setCreches(userCreches);
-      } catch (err) {
-        console.error('Fetch Error:', err);
-        setError('Failed to fetch creches');
-      }
-    };
-
-    fetchCreches();
-  }, []);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -47,25 +22,19 @@ const Applications = () => {
         const { data: applications, error } = await supabase
           .from('applications')
           .select('*');
-          
+
         if (error) throw error;
 
-        const filteredApplications = applications.filter(application =>
-          creches.some(creche => creche.title === application.related_creche)
-        );
-
-        setApplications(filteredApplications);
-        setFilteredApplications(filteredApplications);
+        setApplications(applications);
+        setFilteredApplications(applications);
       } catch (err) {
         console.error('Fetch Error:', err);
         setError('Failed to fetch applications');
       }
     };
 
-    if (creches.length > 0) {
-      fetchApplications();
-    }
-  }, [creches]);
+    fetchApplications();
+  }, []);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
@@ -83,7 +52,7 @@ const Applications = () => {
         .from('applications')
         .delete()
         .eq('id', applicationId);
-        
+
       if (error) throw error;
 
       setApplications(applications.filter(app => app.id !== applicationId));
@@ -115,6 +84,29 @@ const Applications = () => {
 
   const handleCloseApplicationDetails = () => {
     setSelectedApplication(null);
+  };
+
+  const handleStatusChange = async (applicationId, newStatus) => {
+    try {
+      const { data, error } = await supabase
+        .from('applications')
+        .update({ application_status: newStatus })
+        .eq('id', applicationId)
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      setApplications(applications.map(app =>
+        app.id === applicationId ? { ...app, application_status: newStatus } : app
+      ));
+      setFilteredApplications(filteredApplications.map(app =>
+        app.id === applicationId ? { ...app, application_status: newStatus } : app
+      ));
+    } catch (err) {
+      console.error('Status Update Error:', err);
+      setError('Failed to update application status');
+    }
   };
 
   const handleBroadcastClick = () => {
@@ -171,6 +163,12 @@ const Applications = () => {
                 <button onClick={() => handleApplicationClick(application)} className="view-button">
                   <i className="fas fa-eye"></i> View Details
                 </button>
+                <button onClick={() => handleStatusChange(application.id, 'Approved')} className="approve-button">
+                  <i className="fas fa-check"></i> Approve
+                </button>
+                <button onClick={() => handleStatusChange(application.id, 'Declined')} className="decline-button">
+                  <i className="fas fa-times"></i> Decline
+                </button>
                 <button onClick={() => {
                   setApplicationToDelete(application);
                   setShowDeleteOverlay(true);
@@ -211,8 +209,12 @@ const Applications = () => {
         <div className="overlay">
           <div className="warning-overlay">
             <p>Are you sure you want to delete {applicationToDelete?.title}?</p>
-            <button onClick={confirmDelete} className="confirm-delete-button">Yes, Delete</button>
-            <button onClick={cancelDelete} className="cancel-delete-button">Cancel</button>
+            <button onClick={confirmDelete} className="confirm-delete-button">
+              Yes, Delete
+            </button>
+            <button onClick={cancelDelete} className="cancel-delete-button">
+              Cancel
+            </button>
           </div>
         </div>
       )}

@@ -1,4 +1,3 @@
-// src/AddApplication.js
 import React, { useState } from 'react';
 import { supabase } from '../../supabaseOperations/supabaseClient';
 import './Style/AddApplication.css'; // Ensure this file contains the styles for the overlay
@@ -16,6 +15,12 @@ const AddApplication = ({ onClose, onApplicationAdded }) => {
 
   const handleAddApplication = async (e) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!title || !parentName || !parentPhoneNumber || !parentEmail || !parentAddress || !numberOfChildren) {
+      setError('Please fill in all required fields.');
+      return;
+    }
 
     try {
       const { error } = await supabase

@@ -1,4 +1,3 @@
-// src/ApplicationDetails.js
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseOperations/supabaseClient';
 import './Style/ApplicationDetails.css';
@@ -45,6 +44,11 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
   };
 
   const handleUpdateApplication = async () => {
+    if (!title || !parentName || !parentPhoneNumber || !parentEmail) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('applications')
@@ -84,24 +88,28 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
+              required
             />
             <input
               type="text"
               value={parentName}
               onChange={(e) => setParentName(e.target.value)}
               placeholder="Parent's Name"
+              required
             />
             <input
               type="text"
               value={parentPhoneNumber}
               onChange={(e) => setParentPhoneNumber(e.target.value)}
               placeholder="Parent's Phone Number"
+              required
             />
             <input
               type="email"
               value={parentEmail}
               onChange={(e) => setParentEmail(e.target.value)}
               placeholder="Parent's Email"
+              required
             />
             <input
               type="text"
@@ -129,7 +137,7 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
               >
                 <option value="New">New</option>
                 <option value="In Progress">In Progress</option>
-                <option value="Decline">Decline</option>
+                <option value="Declined">Declined</option>
                 <option value="Accepted">Accepted</option>
               </select>
             </div>
