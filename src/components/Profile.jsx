@@ -1,191 +1,256 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import supabase from '../supabaseOperations/supabaseClient'; // Ensure this is correctly set up
+import { validateToken } from '../utils/auth'; // Adjust path as necessary
 import './Profile.css';
 
 const Profile = () => {
-  const [profile, setProfile] = useState({});
-  const [error, setError] = useState('');
-  const [editable, setEditable] = useState(false);
-  const [formData, setFormData] = useState({});
+    const [profile, setProfile] = useState({
+        display_name: '',
+        email: '',
+        first_name: '',
+        last_name: '',
+        phone_number: '',
+        id_number: '',
+        bio: '',
+        profile_picture_url: '',
+        roles: { role_name: '' } // Initialize roles as an object
+    });
+    const [file, setFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem('jwtToken');
-      try {
-        const response = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/users/me?context=edit', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const isValid = await validateToken();
+            if (!isValid) {
+                setError('User not logged in or token expired');
+                return;
+            }
 
-        const { name, first_name, last_name, email, url, description, link, locale, roles, avatar_urls } = response.data;
+            const { data: { session }, error: userError } = await supabase.auth.getSession();
+            if (userError || !session) {
+                setError('Error fetching user session');
+                console.error('Session Error:', userError);
+                return;
+            }
 
-        // Set profile and form data
-        setProfile({
-          name,
-          first_name,
-          last_name,
-          email,
-          url,
-          description,
-          link,
-          locale,
-          roles,
-          avatar_urls
-        });
+            const userId = session.user.id;
 
-        setFormData({
-          name: name || '',
-          first_name: first_name || '',
-          last_name: last_name || '',
-          email: email || '',
-          url: url || '',
-          description: description || '',
-          locale: locale || '',
-          roles: roles ? roles.join(', ') : '', // Convert array to string for display
-          avatar_urls: avatar_urls ? avatar_urls['96'] : '' // Default avatar URL
-        });
-      } catch (err) {
-        setError(err.response ? err.response.data.message : 'Failed to fetch profile');
-      }
+            try {
+                // Fetch user profile with role information
+                const { data, error: profileError } = await supabase
+                    .from('users')
+                    .select(`
+                        display_name,
+                        email,
+                        profile_picture_url,
+                        bio,
+                        first_name,
+                        last_name,
+                        phone_number,
+                        id_number,
+                        roles(role_name)
+                    `)
+                    .eq('id', userId)
+                    .single();
+
+                if (profileError) {
+                    setError('Error fetching profile data');
+                    console.error('Profile Fetch Error:', profileError);
+                    return;
+                }
+
+                console.log(data); // Debug: Check fetched data
+                setProfile(data);
+            } catch (err) {
+                setError('Failed to fetch profile');
+                console.error('Fetch Error:', err);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    const handleImageUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setUploading(true);
+
+        try {
+            // Generate a unique file name
+            const fileName = `${Date.now()}_${file.name}`;
+
+            // Upload the file
+            const { error: uploadError } = await supabase.storage
+                .from('profile-pictures')
+                .upload(fileName, file);
+
+            if (uploadError) throw uploadError;
+
+            // Get the public URL of the uploaded file
+            const { publicURL, error: urlError } = supabase.storage
+                .from('profile-pictures')
+                .getPublicUrl(fileName);
+
+            if (urlError) throw urlError;
+
+            // Get the user session
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) throw sessionError;
+
+            const userId = session.user.id;
+
+            // Update the user's profile with the new profile picture URL
+            const { error: updateError } = await supabase
+                .from('users')
+                .update({ profile_picture_url: publicURL })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            // Update the local state with the new URL
+            setProfile((prevProfile) => ({
+                ...prevProfile,
+                profile_picture_url: publicURL
+            }));
+
+            setSuccess('Profile picture updated successfully!');
+        } catch (err) {
+            setError(`Upload Error: ${err.message}`);
+        } finally {
+            setUploading(false);
+        }
     };
 
-    fetchProfile();
-  }, []);
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setProfile((prevProfile) => ({
+            ...prevProfile,
+            [name]: value
+        }));
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('jwtToken');
-    try {
-      await axios.post('https://shaqeel.wordifysites.com/wp-json/wp/v2/users/me', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProfile({ ...profile, ...formData });
-      setEditable(false);
-    } catch (err) {
-      setError(err.response ? err.response.data.message : 'Failed to update profile');
-    }
-  };
+        try {
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) throw sessionError;
 
-  return (
-    <div className="profile">
-      <h1>Profile</h1>
-      {error && <p className="error">{error}</p>}
-      <div className="profile-details">
-        {editable ? (
-          <form onSubmit={handleSave}>
-            <div className="form-group">
-              <label htmlFor="first_name">First Name</label>
-              <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="last_name">Last Name</label>
-              <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="url">Website URL</label>
-              <input
-                type="url"
-                id="url"
-                name="url"
-                value={formData.url}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="locale">Locale</label>
-              <input
-                type="text"
-                id="locale"
-                name="locale"
-                value={formData.locale}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="roles">Roles</label>
-              <input
-                type="text"
-                id="roles"
-                name="roles"
-                value={formData.roles}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="avatar_urls">Avatar URL (150px)</label>
-              <input
-                type="url"
-                id="avatar_urls"
-                name="avatar_urls"
-                value={formData.avatar_urls}
-                onChange={handleChange}
-              />
-            </div>
-            <button type="submit">Save</button>
-            <button type="button" onClick={() => setEditable(false)}>Cancel</button>
-          </form>
-        ) : (
-          <>
-            {profile.avatar_urls && (
-              <img src={profile.avatar_urls['96']} alt={`${profile.first_name} ${profile.last_name}'s profile`} className="profile-picture" />
+            const userId = session.user.id;
+
+            const { error: updateError } = await supabase
+                .from('users')
+                .update({
+                    display_name: profile.display_name,
+                    first_name: profile.first_name,
+                    last_name: profile.last_name,
+                    phone_number: profile.phone_number,
+                    id_number: profile.id_number,
+                    bio: profile.bio
+                })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            setSuccess('Profile updated successfully!');
+            setIsEditing(false);
+        } catch (err) {
+            setError(`Update Error: ${err.message}`);
+        }
+    };
+
+    return (
+        <div className="profile">
+            <h1>Profile</h1>
+            {error && <p className="error">{error}</p>}
+            {success && <p className="success">{success}</p>}
+
+            {isEditing ? (
+                <form onSubmit={handleSubmit}>
+                    <div className="profile-picture">
+                        <img
+                            src={profile.profile_picture_url || '/default-profile.png'}
+                            alt="Profile"
+                            className="profile-picture-img"
+                        />
+                        <input
+                            type="file"
+                            accept="image/png, image/jpeg"
+                            onChange={handleImageUpload}
+                        />
+                        {uploading && <p>Uploading...</p>}
+                    </div>
+                    <input
+                        type="text"
+                        name="display_name"
+                        value={profile.display_name}
+                        onChange={handleChange}
+                        placeholder="Display Name"
+                    />
+                    <input
+                        type="text"
+                        name="first_name"
+                        value={profile.first_name}
+                        onChange={handleChange}
+                        placeholder="First Name"
+                    />
+                    <input
+                        type="text"
+                        name="last_name"
+                        value={profile.last_name}
+                        onChange={handleChange}
+                        placeholder="Last Name"
+                    />
+                    <input
+                        type="text"
+                        name="phone_number"
+                        value={profile.phone_number}
+                        onChange={handleChange}
+                        placeholder="Phone Number"
+                    />
+                    <input
+                        type="text"
+                        name="id_number"
+                        value={profile.id_number}
+                        onChange={handleChange}
+                        placeholder="ID Number"
+                    />
+                    <textarea
+                        name="bio"
+                        value={profile.bio}
+                        onChange={handleChange}
+                        placeholder="Bio"
+                    />
+                    <button type="submit">Update Profile</button>
+                    <button type="button" onClick={() => setIsEditing(false)}>
+                        Cancel
+                    </button>
+                </form>
+            ) : (
+                <div className="profile-details">
+                    <div className="profile-picture">
+                        <img
+                            src={profile.profile_picture_url || '/default-profile.png'}
+                            alt="Profile"
+                            className="profile-picture-img"
+                        />
+                    </div>
+                    <p><strong>Display Name:</strong> {profile.display_name || 'Not available'}</p>
+                    <p><strong>First Name:</strong> {profile.first_name || 'Not available'}</p>
+                    <p><strong>Last Name:</strong> {profile.last_name || 'Not available'}</p>
+                    <p><strong>Phone Number:</strong> {profile.phone_number || 'Not available'}</p>
+                    <p><strong>ID Number:</strong> {profile.id_number || 'Not available'}</p>
+                    <p><strong>Bio:</strong> {profile.bio || 'Not available'}</p>
+                    <p><strong>Role:</strong> {profile.roles.role_name || 'Not available'}</p> {/* Updated role display */}
+                    <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+                </div>
             )}
-            <h2>{profile.name}</h2>
-            <p>First Name: {profile.first_name || 'Not available'}</p>
-            <p>Last Name: {profile.last_name || 'Not available'}</p>
-            <p>Email: {profile.email || 'Not available'}</p>
-            {profile.url && (
-              <p>
-                Website: <a href={profile.url} target="_blank" rel="noopener noreferrer">{profile.url}</a>
-              </p>
-            )}
-            {profile.description && <p>Description: {profile.description}</p>}
-            {profile.locale && <p>Locale: {profile.locale}</p>}
-            {profile.roles && <p>Roles: {profile.roles.join(', ')}</p>}
-            <button onClick={() => setEditable(true)}>Edit Profile</button>
-          </>
-        )}
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default Profile;

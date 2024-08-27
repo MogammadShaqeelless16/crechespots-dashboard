@@ -1,38 +1,62 @@
+// src/components/Login.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; // Ensure this CSS file includes styles for layout
+import supabase from '../supabaseOperations/supabaseClient'; // Ensure the path is correct
+import './Login.css';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('https://shaqeel.wordifysites.com/wp-json/jwt-auth/v1/token', {
-        username,
+      // Perform login using Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
         password,
       });
-      // Store token in localStorage
-      localStorage.setItem('jwtToken', response.data.data.token); // Adjust based on actual API response
-      // Redirect to dashboard
-      navigate('/dashboard');
+
+      if (error) throw error;
+
+      // Check if user is authenticated
+      if (data.user) {
+        const { user } = data;
+
+        // Insert or update the user in the custom `users` table
+        const { error: dbError } = await supabase
+          .from('users')
+          .upsert({
+            id: user.id, // UUID from Supabase
+            email: user.email,
+            updated_at: new Date().toISOString(), // Update timestamp
+            // Include other fields if necessary
+          });
+
+        if (dbError) throw dbError;
+
+        console.log('Redirecting to dashboard');
+        // Redirect to dashboard
+        navigate('/dashboard');
+      } else {
+        setError('Login failed: User data not found.');
+      }
     } catch (err) {
-      setError(err.response ? err.response.data.message : 'Login failed');
+      console.error('Login error:', err); // Log the error for debugging
+      setError(err.message || 'Login failed');
     }
   };
 
   const handleForgotPassword = () => {
-    navigate('/forgot-password'); // Navigate to the forgot password page
+    navigate('/forgot-password');
   };
 
   const handleSignup = () => {
-    navigate('/signup'); // Navigate to the signup page
+    navigate('/signup');
   };
 
   return (
@@ -51,10 +75,10 @@ const Login = () => {
       <div className="login-form">
         <form onSubmit={handleSubmit}>
           <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
             required
           />
           <input
@@ -81,7 +105,7 @@ const Login = () => {
                 checked={acceptPrivacy}
                 onChange={(e) => setAcceptPrivacy(e.target.checked)}
               />
-              I accept the <a href="https://crechespots.org.za/privacy-policy/" target="_blank" >privacy policy</a>
+              I accept the <a href="https://crechespots.org.za/privacy-policy/" target="_blank">privacy policy</a>
             </label>
           </div>
           <button type="submit" disabled={!acceptTerms || !acceptPrivacy}>

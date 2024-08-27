@@ -1,0 +1,93 @@
+.user-management-screen {
+    padding: 20px;
+  }
+  
+  .user-form {
+    margin-bottom: 20px;
+  }
+  
+  .user-form input, .user-form select, .user-form button {
+    display: block;
+    margin: 10px 0;
+  }
+  
+  .user-list {
+    margin-top: 20px;
+  }
+  
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .user-table th, .user-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .user-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .user-table td {
+    text-align: center;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .overlay-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .edit-overlay .overlay-content {
+    width: 400px;
+  }
+  
+  .delete-overlay .overlay-content {
+    width: 300px;
+  }
+  
+  button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  button[type="button"] {
+    background-color: #6c757d;
+  }
+  
+  button[type="button"]:hover {
+    background-color: #5a6268;
+  }
+  
+  button[type="submit"] {
+    background-color: #28a745;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #218838;
+  }
+  

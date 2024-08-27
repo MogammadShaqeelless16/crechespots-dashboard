@@ -1,5 +1,6 @@
+// src/AddApplication.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import { supabase } from '../../supabaseOperations/supabaseClient';
 import './Style/AddApplication.css'; // Ensure this file contains the styles for the overlay
 
 const AddApplication = ({ onClose, onApplicationAdded }) => {
@@ -15,14 +16,26 @@ const AddApplication = ({ onClose, onApplicationAdded }) => {
 
   const handleAddApplication = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      setError('No authentication token found.');
-      return;
-    }
 
     try {
-      const response = await axios.post('https://shaqeel.wordifysites.com/wp-json/wp/v2/application', {
+      const { error } = await supabase
+        .from('applications')
+        .insert([{
+          title,
+          parent_name: parentName,
+          parent_phone_number: parentPhoneNumber,
+          parent_email: parentEmail,
+          parent_address: parentAddress,
+          number_of_children: numberOfChildren,
+          application_status: applicationStatus,
+          application_description: description,
+          created_at: new Date().toISOString() // Assuming you want to track when the application was created
+        }]);
+        
+      if (error) throw error;
+
+      // Optionally, you can fetch the new application details here
+      onApplicationAdded({
         title,
         parent_name: parentName,
         parent_phone_number: parentPhoneNumber,
@@ -30,15 +43,12 @@ const AddApplication = ({ onClose, onApplicationAdded }) => {
         parent_address: parentAddress,
         number_of_children: numberOfChildren,
         application_status: applicationStatus,
-        description,
-        status: 'publish'
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
+        application_description: description,
       });
-      onApplicationAdded(response.data);
+      onClose();
     } catch (err) {
       console.error('Add Error:', err);
-      setError(err.response ? err.response.data.message : 'Failed to add application');
+      setError(err.message || 'Failed to add application');
     }
   };
 

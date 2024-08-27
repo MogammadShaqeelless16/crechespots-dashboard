@@ -177,3 +177,41 @@
     color: #66b2ff; /* Change color on hover in dark mode */
   }
   
+
+  .admin-menu {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .admin-menu .menu-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+  }
+  
+  .admin-menu-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+  
+  .admin-menu:hover .admin-menu-dropdown {
+    display: block;
+  }
+  
+  .admin-menu-dropdown .dropdown-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .admin-menu-dropdown .dropdown-item:hover {
+    background-color: #f1f1f1;
+  }
+  

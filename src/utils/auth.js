@@ -1,35 +1,55 @@
-// src/utils/auth.js
-import axios from 'axios';
+import supabase from '../supabaseOperations/supabaseClient'; // Ensure the path is correct
 
 // Function to clear token from localStorage
 export const clearToken = () => {
-  localStorage.removeItem('jwtToken');
+  localStorage.removeItem('jwtToken'); // Clear Supabase token if you are storing it manually
+};
+
+
+const fetchProfile = async () => {
+  // Validate token and get user session
+  const isValid = await validateToken();
+  if (!isValid) {
+    setError('User not logged in or token expired');
+    return;
+  }
+
+  const { data: { session }, error: userError } = await supabase.auth.getSession();
+  if (userError || !session) {
+    setError('Error fetching user session');
+    console.error('Session Error:', userError);
+    return;
+  }
+
+  const userId = session.user.id;
+
+  try {
+    // Fetch user data from the 'users' table
+    const { data, error: profileError } = await supabase
+      .from('users') // Ensure this table name matches your Supabase schema
+      .select('display_name, email, roles') // Fetch only the needed fields
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      setError('Error fetching profile data');
+      console.error('Profile Fetch Error:', profileError);
+      return;
+    }
+
+    // Set profile data
+    setProfile(data);
+  } catch (err) {
+    setError('Failed to fetch profile');
+    console.error('Fetch Error:', err);
+  }
 };
 
 // Function to validate token
 export const validateToken = async () => {
-  const token = localStorage.getItem('jwtToken');
-  if (!token) {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || !session) {
     return false;
   }
-
-  try {
-    await axios.post(
-      'https://shaqeel.wordifysites.com/wp-json/api/v1/token-validate',
-      {}, // Assuming no body content is needed for validation
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return true; // Token is valid
-  } catch (error) {
-    console.error('Token validation failed:', error.response ? error.response.data : error.message);
-
-    // Clear invalid or expired token
-    clearToken();
-    
-    return false; // Token is invalid or expired
-  }
+  return true;
 };

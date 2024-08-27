@@ -1,0 +1,63 @@
+/* CrecheManagementScreen.css */
+.creche-management-screen {
+    padding: 20px;
+  }
+  
+  .add-creche-button {
+    margin-bottom: 20px;
+  }
+  
+  .creche-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .creche-box {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    width: calc(33.333% - 40px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  
+  .creche-box h3 {
+    margin-top: 0;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .overlay-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+  }
+  
+  .overlay-content form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .overlay-content input,
+  .overlay-content textarea,
+  .overlay-content button {
+    margin-bottom: 10px;
+  }
+  
+  .overlay-content button {
+    cursor: pointer;
+  }
+  

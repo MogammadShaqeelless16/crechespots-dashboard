@@ -4,6 +4,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Modal from 'react-modal';
 import ICAL from 'ical.js';
+import supabase from '../../supabaseOperations/supabaseClient'; // Ensure correct path
 
 const localizer = momentLocalizer(moment);
 
@@ -22,77 +23,68 @@ const UpcomingEvents = () => {
     title: "",
     start: new Date(), // Default to current date/time
     end: new Date(),   // Default to current date/time
+    allDay: false
   });
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch('https://calendar.google.com/calendar/ical/en.sa%23holiday%40group.v.calendar.google.com/public/basic.ics');
-        const data = await response.text();
-        
-        const jcalData = ICAL.parse(data);
-        const comp = new ICAL.Component(jcalData);
-        const events = comp.getAllProperties('vevent');
 
-        const formattedEvents = events.map(event => {
-          const e = new ICAL.Event(event);
-          return {
-            title: e.summary || 'No Title',
-            start: new Date(e.startDate.toJSDate()),
-            end: new Date(e.endDate.toJSDate()),
-            allDay: e.allDay,
-          };
-        });
-
-        setEvents(formattedEvents);
-      } catch (error) {
-        console.error('Failed to fetch or parse events:', error);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
-  useEffect(() => {
-    // Load events from local storage
-    const savedEvents = JSON.parse(localStorage.getItem('events')) || [];
-    setFormattedEvents(savedEvents);
-
-    // Merge fetched events with locally stored events
-    setFormattedEvents(prevEvents => [...prevEvents, ...events]);
-  }, [events]);
-
-  useEffect(() => {
-    // Save events to local storage
-    localStorage.setItem('events', JSON.stringify(formattedEvents));
-  }, [formattedEvents]);
-
-  const handleAddEvent = () => {
+  const handleAddEvent = async () => {
     if (!newEvent.title || !newEvent.start || !newEvent.end) {
       alert("Please fill in all fields.");
       return;
     }
 
-    const updatedEvents = [...formattedEvents, newEvent];
-    setFormattedEvents(updatedEvents);
-    setNewEvent({
-      title: "",
-      start: new Date(), // Reset to current date/time
-      end: new Date(),   // Reset to current date/time
-    });
-    setModalIsOpen(false); // Close modal after adding
-    handleSendToGoogleCalendar(newEvent); // Send event to Google Calendar
-  };
+    try {
+      // Get user session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session || !session.user) {
+        throw new Error("User not authenticated.");
+      }
 
-  const handleSendToGoogleCalendar = (event) => {
-    const { title, start, end } = event;
-    const startISO = new Date(start).toISOString().replace(/-|:|\.\d+/g, "").slice(0, 15) + "Z";
-    const endISO = new Date(end).toISOString().replace(/-|:|\.\d+/g, "").slice(0, 15) + "Z";
-    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-      title
-    )}&dates=${startISO}/${endISO}&details=&location=&sf=true&output=xml`;
+      // Retrieve user profile to get the integer ID (assuming you have a `users` table with integer IDs)
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', session.user.id)
+        .single();
 
-    window.open(googleCalendarUrl, "_blank");
+      if (profileError || !profile) {
+        throw new Error('Failed to retrieve user profile.');
+      }
+
+      // Prepare the payload
+      const eventPayload = {
+        title: newEvent.title,
+        start: newEvent.start.toISOString(), // Ensure correct ISO format
+        end_time: newEvent.end.toISOString(), // Ensure correct ISO format
+        all_day: newEvent.allDay,
+        user_id: profile.id // Use the integer ID from the `users` table
+      };
+
+      // Send the event to Supabase
+      const { data, error } = await supabase
+        .from('events')
+        .insert([eventPayload]);
+
+      if (error) {
+        console.error('Supabase Error:', error.message);
+        throw error;
+      }
+
+      // Update local state
+      const updatedEvents = [...formattedEvents, newEvent];
+      setFormattedEvents(updatedEvents);
+      setNewEvent({
+        title: "",
+        start: new Date(),
+        end: new Date(),
+        allDay: false
+      });
+      setModalIsOpen(false);
+    } catch (err) {
+      console.error('Failed to add event:', err);
+      setError('Failed to add event');
+    }
   };
 
   return (
@@ -140,6 +132,14 @@ const UpcomingEvents = () => {
               type="datetime-local"
               value={formatDateForInput(newEvent.end)}
               onChange={e => setNewEvent({ ...newEvent, end: new Date(e.target.value) })}
+            />
+          </div>
+          <div>
+            <label>All Day</label>
+            <input
+              type="checkbox"
+              checked={newEvent.allDay}
+              onChange={e => setNewEvent({ ...newEvent, allDay: e.target.checked })}
             />
           </div>
           <button type="button" onClick={handleAddEvent}>Add Event</button>

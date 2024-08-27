@@ -1,5 +1,6 @@
+// src/Applications.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '../../supabaseOperations/supabaseClient';
 import ApplicationDetails from './ApplicationDetails';
 import AddApplication from './AddApplication';
 import BroadcastDetails from '../Student/BroadcastDetails';
@@ -19,30 +20,21 @@ const Applications = () => {
 
   useEffect(() => {
     const fetchCreches = async () => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        setError('No authentication token found.');
-        return;
-      }
-
       try {
-        const profileResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/users/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const userName = profileResponse.data.name;
+        const { data: creches, error } = await supabase
+          .from('creches')
+          .select('*');
+          
+        if (error) throw error;
 
-        const crecheResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/creche', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const userCreches = crecheResponse.data.filter(creche =>
-          creche.assigned_user === userName
-        );
+        // Assuming the 'assigned_user' column exists and is used for filtering
+        const userName = 'YourUserName'; // Retrieve this value as needed
+        const userCreches = creches.filter(creche => creche.assigned_user === userName);
 
         setCreches(userCreches);
       } catch (err) {
         console.error('Fetch Error:', err);
-        setError(err.response ? err.response.data.message : 'Failed to fetch creches');
+        setError('Failed to fetch creches');
       }
     };
 
@@ -51,26 +43,22 @@ const Applications = () => {
 
   useEffect(() => {
     const fetchApplications = async () => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        setError('No authentication token found.');
-        return;
-      }
-
       try {
-        const response = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/application', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data: applications, error } = await supabase
+          .from('applications')
+          .select('*');
+          
+        if (error) throw error;
 
-        const filteredApplications = response.data.filter(application =>
-          creches.some(creche => creche.title.rendered === application.related_creche)
+        const filteredApplications = applications.filter(application =>
+          creches.some(creche => creche.title === application.related_creche)
         );
 
         setApplications(filteredApplications);
         setFilteredApplications(filteredApplications);
       } catch (err) {
         console.error('Fetch Error:', err);
-        setError(err.response ? err.response.data.message : 'Failed to fetch applications');
+        setError('Failed to fetch applications');
       }
     };
 
@@ -83,29 +71,27 @@ const Applications = () => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     const filtered = applications.filter(application =>
-      application.title.rendered.toLowerCase().includes(query) ||
+      application.title.toLowerCase().includes(query) ||
       (application.application_status && application.application_status.toLowerCase().includes(query))
     );
     setFilteredApplications(filtered);
   };
 
   const handleDeleteApplication = async (applicationId) => {
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      setError('No authentication token found.');
-      return;
-    }
-
     try {
-      await axios.delete(`https://shaqeel.wordifysites.com/wp-json/wp/v2/application/${applicationId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { error } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', applicationId);
+        
+      if (error) throw error;
+
       setApplications(applications.filter(app => app.id !== applicationId));
       setFilteredApplications(filteredApplications.filter(app => app.id !== applicationId));
       setShowDeleteOverlay(false);
     } catch (err) {
       console.error('Delete Error:', err);
-      setError(err.response ? err.response.data.message : 'Failed to delete application');
+      setError('Failed to delete application');
     }
   };
 
@@ -175,7 +161,7 @@ const Applications = () => {
         {filteredApplications.length > 0 ? (
           filteredApplications.map(application => (
             <div key={application.id} className="application-item">
-              <h3>{application.title.rendered}</h3>
+              <h3>{application.title}</h3>
               <p><strong>Parent's Name:</strong> {application.parent_name}</p>
               <p><strong>Parent's Phone Number:</strong> {application.parent_phone_number}</p>
               <p><strong>Parent's Email:</strong> {application.parent_email}</p>
@@ -224,7 +210,7 @@ const Applications = () => {
       {showDeleteOverlay && (
         <div className="overlay">
           <div className="warning-overlay">
-            <p>Are you sure you want to delete {applicationToDelete?.title.rendered}?</p>
+            <p>Are you sure you want to delete {applicationToDelete?.title}?</p>
             <button onClick={confirmDelete} className="confirm-delete-button">Yes, Delete</button>
             <button onClick={cancelDelete} className="cancel-delete-button">Cancel</button>
           </div>
