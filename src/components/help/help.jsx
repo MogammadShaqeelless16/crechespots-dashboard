@@ -1,40 +1,47 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './style/help.css'; // Ensure you have this CSS file for styling
+import React, { useState, useEffect } from 'react';
+import supabase from '../../supabaseOperations/supabaseClient'; // Adjust path as needed
+import ReactQuill from 'react-quill'; // Import the WYSIWYG editor
+import 'react-quill/dist/quill.snow.css'; // Import styles for the editor
+import './style/help.css';
 
 const Help = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [helpArticles, setHelpArticles] = useState([]);
+    const [userRole, setUserRole] = useState('');
+    const [selectedArticle, setSelectedArticle] = useState(null);
+    const [editorContent, setEditorContent] = useState('');
+    const [newArticleTitle, setNewArticleTitle] = useState('');
+    const [showAddForm, setShowAddForm] = useState(false);
 
-    const helpArticles = [
-        { title: 'How to Update Creche Information', link: '/help/update-creche-info' },
-        { title: 'How to Add a Student', link: '/help/add-student' },
-        { title: 'How to Add an Application', link: '/help/add-application' },
-        { title: 'How to View and Manage Applications', link: '/help/manage-applications' },
-        { title: 'How to Update Student Information', link: '/help/update-student-info' },
-        { title: 'How to Set Up Notifications', link: '/help/setup-notifications' },
-        { title: 'How to Manage Creche Staff', link: '/help/manage-staff' },
-        { title: 'How to View Creche Reports', link: '/help/view-reports' },
-        { title: 'How to Reset Your Password', link: '/help/reset-password' },
-        { title: 'How to Contact Support', link: '/help/contact-support' },
-        { title: 'How to Customize Your Profile', link: '/help/customize-profile' },
-        { title: 'How to Access and Use the Dashboard', link: '/help/use-dashboard' },
-        { title: 'How to Manage Your Wish List', link: '/help/manage-wishlist' },
-        { title: 'How to Log In and Out of the App', link: '/help/login-logout' },
-        { title: 'How to Enable Dark Mode', link: '/help/enable-dark-mode' },
-        { title: 'How to Update Your Account Settings', link: '/help/update-account-settings' },
-        { title: 'How to Add New Creche Locations', link: '/help/add-creche-locations' },
-        { title: 'How to Provide Feedback', link: '/help/provide-feedback' },
-        { title: 'How to Navigate the App', link: '/help/navigate-app' },
-        { title: 'How to Use the Search Feature', link: '/help/use-search-feature' },
-        { title: 'How to Manage User Roles and Permissions', link: '/help/manage-roles-permissions' }
-    ];
+    useEffect(() => {
+        // Fetch help articles from Supabase
+        const fetchHelpArticles = async () => {
+            const { data, error } = await supabase
+                .from('help_articles')
+                .select('*');
+            if (!error) {
+                setHelpArticles(data);
+            }
+        };
 
-    const faqs = [
-        { question: 'What should I do if I forget my password?', answer: 'Use the "Reset Password" feature on the login page to receive a password reset link.' },
-        { question: 'How can I update my profile information?', answer: 'Go to your profile settings and update the necessary details.' },
-        { question: 'Who can I contact for technical support?', answer: 'You can contact support via the "Contact Support" link in the Help section.' },
-        { question: 'How can I add a new creche?', answer: 'Navigate to the "Manage Creche" section and select "Add New Creche" to fill in the details.' }
-    ];
+        // Fetch user role from Supabase
+        const fetchUserRole = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('roles(role_name)')
+                    .eq('id', user.id)
+                    .single();
+                if (!error) {
+                    setUserRole(data.roles.role_name);
+                }
+            }
+        };
+
+        fetchHelpArticles();
+        fetchUserRole();
+    }, []);
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value.toLowerCase());
@@ -43,6 +50,67 @@ const Help = () => {
     const filteredArticles = helpArticles.filter(article =>
         article.title.toLowerCase().includes(searchTerm)
     );
+
+    const handleArticleClick = (article) => {
+        setSelectedArticle(article);
+        setEditorContent(article.content); // Load content into editor
+    };
+
+    const handleOverlayClose = () => {
+        setSelectedArticle(null);
+        setEditorContent(''); // Clear editor content
+        setShowAddForm(false); // Close the add form if open
+    };
+
+    const handleArticleEdit = async () => {
+        if (userRole === 'Administrator' || userRole === 'Developer') {
+            const { error } = await supabase
+                .from('help_articles')
+                .update({ content: editorContent })
+                .eq('id', selectedArticle.id);
+            if (!error) {
+                // Refresh articles after editing
+                setHelpArticles(helpArticles.map(article =>
+                    article.id === selectedArticle.id ? { ...article, content: editorContent } : article
+                ));
+                handleOverlayClose(); // Close overlay after editing
+            }
+        }
+    };
+
+    const handleArticleDelete = async () => {
+        if (userRole === 'Administrator' || userRole === 'Developer') {
+            const { error } = await supabase
+                .from('help_articles')
+                .delete()
+                .eq('id', selectedArticle.id);
+            if (!error) {
+                // Refresh articles after deletion
+                setHelpArticles(helpArticles.filter(article => article.id !== selectedArticle.id));
+                handleOverlayClose(); // Close overlay after deletion
+            }
+        }
+    };
+
+    const handleAddArticle = async () => {
+        if (userRole === 'Administrator' || userRole === 'Developer') {
+            const { error } = await supabase
+                .from('help_articles')
+                .insert([{ title: newArticleTitle, content: editorContent }]);
+            if (!error) {
+                // Refresh articles after adding
+                const { data, error: fetchError } = await supabase
+                    .from('help_articles')
+                    .select('*');
+                if (!fetchError) {
+                    setHelpArticles(data);
+                    setNewArticleTitle('');
+                    setEditorContent('');
+                    setShowAddForm(false); // Hide the form after adding
+                }
+            }
+        }
+    };
 
     return (
         <div className="help-container">
@@ -55,28 +123,68 @@ const Help = () => {
                     onChange={handleSearchChange}
                     className="search-bar"
                 />
+                {userRole === 'Administrator' || userRole === 'Developer' ? (
+                    <button
+                        className="add-article-button"
+                        onClick={() => setShowAddForm(!showAddForm)}
+                    >
+                        {showAddForm ? 'Cancel' : 'Add Article'}
+                    </button>
+                ) : null}
             </div>
             <div className="help-cards">
                 {filteredArticles.length > 0 ? (
-                    filteredArticles.map((article, index) => (
-                        <div key={index} className="help-card">
+                    filteredArticles.map((article) => (
+                        <div key={article.id} className="help-card">
                             <h2>{article.title}</h2>
-                            <Link to={article.link} className="read-more-button">Read More</Link>
+                            <button onClick={() => handleArticleClick(article)}>Read More</button>
                         </div>
                     ))
                 ) : (
                     <p>No articles found.</p>
                 )}
             </div>
-            <div className="faq-section">
-                <h2>Frequently Asked Questions</h2>
-                {faqs.map((faq, index) => (
-                    <div key={index} className="faq-item">
-                        <h3>{faq.question}</h3>
-                        <p>{faq.answer}</p>
+
+            {showAddForm && (
+                <div className="overlay">
+                    <div className="overlay-content">
+                        <h2>Add New Article</h2>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            value={newArticleTitle}
+                            onChange={(e) => setNewArticleTitle(e.target.value)}
+                        />
+                        <ReactQuill
+                            value={editorContent}
+                            onChange={setEditorContent}
+                        />
+                        <button onClick={handleAddArticle}>Add Article</button>
+                        <button onClick={handleOverlayClose}>Cancel</button>
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
+
+            {selectedArticle && (
+                <div className="overlay">
+                    <div className="overlay-content">
+                        <h2>{selectedArticle.title}</h2>
+                        {userRole === 'Administrator' || userRole === 'Developer' ? (
+                            <>
+                                <ReactQuill
+                                    value={editorContent}
+                                    onChange={setEditorContent}
+                                />
+                                <button onClick={handleArticleEdit}>Save Changes</button>
+                                <button onClick={handleArticleDelete}>Delete</button>
+                            </>
+                        ) : (
+                            <div dangerouslySetInnerHTML={{ __html: selectedArticle.content }} />
+                        )}
+                        <button onClick={handleOverlayClose}>Close</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
