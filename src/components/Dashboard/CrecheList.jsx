@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchCrecheList } from '../../supabaseOperations/crecheOperations'; // Adjust import path
 import supabase from '../../supabaseOperations/supabaseClient'; // Adjust import path
 import './CrecheList.css'; // Ensure this path matches your CSS file location
 
 const CrecheList = () => {
   const [creches, setCreches] = useState([]);
+  const [userCreches, setUserCreches] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -46,13 +46,36 @@ const CrecheList = () => {
       setUserName(user.first_name);
 
       // Fetch creche IDs linked to the user
-      const result = await fetchCrecheList(userId);
+      const { data: userCrecheData, error: userCrecheError } = await supabase
+        .from('user_creche')
+        .select('creche_id')
+        .eq('user_id', userId);
 
-      if (result.success) {
-        setCreches(result.data);
-      } else {
-        setError(result.error || 'An error occurred while fetching creches.');
+      if (userCrecheError) {
+        setError('Failed to retrieve user creches.');
+        setLoading(false);
+        return;
       }
+
+      const crecheIds = userCrecheData.map(uc => uc.creche_id);
+
+      if (crecheIds.length > 0) {
+        const { data: crecheData, error: crecheError } = await supabase
+          .from('creches') // Ensure this table name is correct
+          .select('*')
+          .in('id', crecheIds);
+
+        if (crecheError) {
+          setError('Failed to retrieve creches.');
+          setLoading(false);
+          return;
+        }
+
+        setUserCreches(crecheData);
+      } else {
+        setUserCreches([]);
+      }
+
       setLoading(false);
     };
 
@@ -64,11 +87,11 @@ const CrecheList = () => {
 
   return (
     <div className="creche-list-container">
-      <h1>Welcome, {userName}!</h1>
-      <h2>My Creches</h2>
-      {creches.length > 0 ? (
+      <h1>My Creches</h1>
+      <h2>.......</h2>
+      {userCreches.length > 0 ? (
         <div className="creche-grid">
-          {creches.map((creche) => (
+          {userCreches.map((creche) => (
             <div key={creche.id} className="creche-box">
               <div className="creche-image-container">
                 <img

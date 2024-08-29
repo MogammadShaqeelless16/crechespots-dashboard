@@ -5,6 +5,7 @@ import './Dashboard.css';
 import DashboardCounters from './DashboardCounters';
 import CrecheList from './CrecheList';
 import UpcomingEvents from './UpcomingEvents';
+import Welcome from './Welcome';
 
 const Dashboard = () => {
   const [creches, setCreches] = useState([]);
@@ -124,6 +125,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
+    <Welcome />
       <DashboardCounters
         studentsCount={studentsCount}
         applicationsCount={applicationsCount}

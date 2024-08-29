@@ -11,6 +11,7 @@ export const fetchUsersFromSupabase = async () => {
       .select(`
         id,
         email,
+        phone_number,
         display_name,
         role_id,
         roles (role_name),

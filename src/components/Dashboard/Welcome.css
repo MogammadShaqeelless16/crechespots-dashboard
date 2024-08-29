@@ -1,0 +1,45 @@
+/* welcome.css */
+
+.welcome-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 20px;
+  }
+  
+  .welcome-heading {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .welcome-loading,
+  .welcome-error {
+    font-size: 1.5rem;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .welcome-error {
+    color: #ff4d4d; /* Error color */
+  }
+  
+  @keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+  }
+  
+  /* Keyframes for cursor blinking effect */
+  @keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #fff }
+  }
+
+  
+  .typewriter-text {
+    overflow: hidden;
+    border-right: 0.15em solid #fff; /* Cursor effect */
+    white-space: nowrap;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+  }

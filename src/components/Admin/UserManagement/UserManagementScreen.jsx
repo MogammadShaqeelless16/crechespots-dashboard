@@ -130,8 +130,9 @@ const UserManagementScreen = () => {
         <table className="user-table">
           <thead>
             <tr>
+              <th>Display Name</th>
               <th>Email</th>
-              <th>Phone</th>
+              <th>Phone Number</th>
               <th>Role</th>
               <th>Creches</th>
               <th>Actions</th>
@@ -140,8 +141,9 @@ const UserManagementScreen = () => {
           <tbody>
             {filteredUsers.map(user => (
               <tr key={user.id}>
+                <td>{user.display_name}</td>
                 <td>{user.email}</td>
-                <td>{user.phone || 'No phone'}</td>
+                <td>{user.phone_number || 'No phone'}</td>
                 <td>{roles.find(role => role.id === user.role_id)?.role_name || 'No Role'}</td>
                 <td>{user.creches?.map(creche => creche.name).join(', ') || 'No Creches'}</td>
                 <td>
