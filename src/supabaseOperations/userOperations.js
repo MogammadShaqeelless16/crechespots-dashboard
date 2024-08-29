@@ -1,5 +1,7 @@
 import { supabase } from './supabaseClient';
 
+
+
 // Fetch users with their roles and optional creches
 export const fetchUsersFromSupabase = async () => {
   try {

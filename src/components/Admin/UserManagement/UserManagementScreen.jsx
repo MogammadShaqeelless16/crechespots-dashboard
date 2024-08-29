@@ -24,6 +24,7 @@ const UserManagementScreen = () => {
     const loadUsers = async () => {
       const { success, data } = await fetchUsersFromSupabase();
       if (success) {
+        console.log('Loaded users:', data.users); // Log loaded users
         setUsers(data.users);
       } else {
         setError('Failed to fetch users from Supabase.');

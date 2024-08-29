@@ -19,6 +19,7 @@ import InvoiceGenerator from './components/Reports/InvoiceGenerator';
 import AttendanceStaffReport from './components/Reports/AttendanceStaffReport'; // Import Staff Attendance Report
 import { DataProvider } from './Context/DataContext'; // Import the DataProvider
 import supabase  from './supabaseOperations/supabaseClient'; // Import Supabase client
+import StudentAttendanceReport from './components/Reports/StudentAttendanceReport';
 
 // Helper function to protect routes
 const ProtectedRoute = ({ element }) => {
@@ -71,10 +72,12 @@ function App() {
             <Route path="/applications" element={<ProtectedRoute element={<Applications />} />} />
             <Route path="/reports" element={<ProtectedRoute element={<Report />} />} />
             <Route path="/reports/staff-attendance" element={<ProtectedRoute element={<AttendanceStaffReport month={8} year={2024} />} />} />
+            <Route path="/reports/staff-attendance" element={<ProtectedRoute element={<AttendanceStaffReport month={8} year={2024} />} />} />
             <Route path="/invoice-generator" element={<InvoiceGenerator />} />
             <Route path="/crecheWishlist" element={<ProtectedRoute element={<CrecheWishlist />} />} />
             <Route path="/help" element={<ProtectedRoute element={<Help />} />} />
             <Route path="/userManagement" element={<ProtectedRoute element={<UserManagementScreen />} />} />
+            <Route path="/reports/student-attendance" element={<ProtectedRoute element={<StudentAttendanceReport />} />} />
             <Route path="/crecheManagement" element={<ProtectedRoute element={<CrecheListScreen />} />} />
             {/* Redirect unknown routes to home */}
             <Route path="*" element={<Navigate to="/" />} />

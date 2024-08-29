@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import UserCrecheFilter from '../User/UserCrecheFilter';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseOperations/supabaseClient';
 import './Style/AddStudent.css';
 
 const AddStudent = ({ onClose }) => {
@@ -15,6 +14,34 @@ const AddStudent = ({ onClose }) => {
   const [creches, setCreches] = useState([]);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const fetchCreches = async () => {
+      try {
+        const { data: userData, error: userError } = await supabase
+          .from('user_creche')
+          .select('creche_ids')
+          .eq('id', supabase.auth.user().id)
+          .single();
+
+        if (userError) throw new Error(userError.message);
+
+        const { data: crecheData, error: crecheError } = await supabase
+          .from('creches')
+          .select('*')
+          .in('id', userData.creche_ids);
+
+        if (crecheError) throw new Error(crecheError.message);
+
+        setCreches(crecheData);
+      } catch (err) {
+        setError('Failed to load creches.');
+        console.error(err);
+      }
+    };
+
+    fetchCreches();
+  }, []);
+
   const handleFormChange = (e) => {
     setFormData({
       ...formData,
@@ -24,29 +51,28 @@ const AddStudent = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      setError('No authentication token found.');
-      return;
-    }
 
     try {
-      await axios.post('https://shaqeel.wordifysites.com/wp-json/wp/v2/student', {
-        ...formData,
-        status: 'publish'
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const { error } = await supabase
+        .from('students')
+        .insert([
+          {
+            name: formData.fullName,
+            student_number: formData.studentNumber,
+            parent_name: formData.parentName,
+            parent_whatsapp: formData.parentWhatsappNumber,
+            parent_phone_number: formData.parentNumber,
+            creche_id: formData.relatedCreche,
+            dob: new Date() // Set default DOB or add a DOB field to the form if needed
+          }
+        ]);
+
+      if (error) throw new Error(error.message);
 
       onClose(); // Close the form on successful submission
     } catch (err) {
-      setError(err.response ? err.response.data.message : 'Failed to add student');
+      setError(err.message || 'Failed to add student');
     }
-  };
-
-  // Handle the loaded creches from UserCrecheFilter
-  const handleCrechesLoaded = (creches) => {
-    setCreches(creches);
   };
 
   return (
@@ -116,7 +142,7 @@ const AddStudent = ({ onClose }) => {
               <option value="">Select Creche</option>
               {creches.map(creche => (
                 <option key={creche.id} value={creche.id}>
-                  {creche.post_title}
+                  {creche.name}
                 </option>
               ))}
             </select>
@@ -125,7 +151,6 @@ const AddStudent = ({ onClose }) => {
           <button type="button" onClick={onClose}>Close</button>
         </form>
       </div>
-      <UserCrecheFilter onCrechesLoaded={handleCrechesLoaded} />
     </div>
   );
 };

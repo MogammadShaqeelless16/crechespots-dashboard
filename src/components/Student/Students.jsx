@@ -1,65 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import AddStudent from './AddStudent';
 import StudentDetails from './StudentDetails';
 import BroadcastDetails from './BroadcastDetails';
-import './Style/Students.css'; // Ensure this file includes styles for icons
+import { supabase } from '../../supabaseOperations/supabaseClient';
+import { fetchCurrentUserData } from '../../supabaseOperations/userOperations';
+import './Style/Students.css';
 
 const Students = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
-  const [error, setError] = useState('');
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [showStudentDetails, setShowStudentDetails] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const [showBroadcast, setShowBroadcast] = useState(false);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        setError('No authentication token found.');
-        return;
-      }
-
+    const loadStudentData = async () => {
       try {
-        const profileResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/users/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const userName = profileResponse.data.name;
+        const { success, data, error } = await fetchCurrentUserData();
 
-        const crecheResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/creche', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        if (!success) {
+          setStudents([]);
+          setFilteredStudents([]);
+          return;
+        }
 
-        const crecheTitleMap = crecheResponse.data.reduce((map, creche) => {
-          if (creche.assigned_user && creche.assigned_user === userName) {
-            map[creche.id] = creche.title.rendered;
-          }
-          return map;
-        }, {});
+        const { crecheIds } = data;
 
-        const studentResponse = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/student', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        if (!Array.isArray(crecheIds) || crecheIds.length === 0) {
+          setStudents([]);
+          setFilteredStudents([]);
+          return;
+        }
 
-        const filtered = studentResponse.data.filter(student =>
-          Object.values(crecheTitleMap).includes(student.related_creche)
-        );
+        const { data: studentsData, error: studentsError } = await supabase
+          .from('students')
+          .select('*')
+          .in('creche_id', crecheIds);
 
-        setStudents(studentResponse.data);
-        setFilteredStudents(filtered);
+        if (studentsError) throw new Error(studentsError.message);
 
-      } catch (err) {
-        console.error('Fetch Error:', err);
-        setError(err.response ? err.response.data.message : 'Failed to fetch students');
+        if (Array.isArray(studentsData)) {
+          setStudents(studentsData);
+          setFilteredStudents(studentsData);
+        } else {
+          setStudents([]);
+          setFilteredStudents([]);
+        }
+      } catch (error) {
+        console.error('Error fetching students data:', error);
       }
     };
 
-    fetchStudents();
+    loadStudentData();
   }, []);
 
   const exportToExcel = () => {
@@ -69,13 +66,16 @@ const Students = () => {
     }
 
     const ws = XLSX.utils.json_to_sheet(filteredStudents.map(student => ({
-      FullName: student.title.rendered,
-      Creche: student.related_creche || 'N/A',
+      Name: student.name || 'N/A',
+      Age: student.age || 'N/A',
+      Class: student.class || 'N/A',
+      ParentName: student.parent_name || 'N/A',
+      Contact: student.contact || 'N/A',
     })));
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Students');
+    XLSX.utils.book_append_sheet(wb, ws, 'Students Report');
 
-    XLSX.writeFile(wb, 'students.xlsx');
+    XLSX.writeFile(wb, 'students_report.xlsx');
   };
 
   const handleAddStudentClick = () => {
@@ -86,38 +86,29 @@ const Students = () => {
     setShowAddStudent(false);
   };
 
-  const handleStudentAdded = () => {
-    fetchStudents();
+  const handleStudentAdded = async (newStudent) => {
+    try {
+      const { data, error } = await supabase
+        .from('students')
+        .insert([newStudent]);
+
+      if (error) throw new Error(error.message);
+
+      setStudents(prev => [...prev, data[0]]);
+      setFilteredStudents(prev => [...prev, data[0]]);
+    } catch (error) {
+      console.error('Error adding student:', error);
+    }
   };
 
-  const handleStudentClick = (student) => {
+  const handleViewDetails = (student) => {
     setSelectedStudent(student);
+    setShowStudentDetails(true);
   };
 
   const handleCloseStudentDetails = () => {
+    setShowStudentDetails(false);
     setSelectedStudent(null);
-  };
-
-  const handleStudentUpdated = () => {
-    fetchStudents();
-  };
-
-  const handleBroadcastClick = () => {
-    setShowBroadcast(true);
-  };
-
-  const handleCloseBroadcast = () => {
-    setShowBroadcast(false);
-  };
-
-  const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    const filtered = students.filter(student =>
-      student.title.rendered.toLowerCase().includes(query) ||
-      (student.related_creche && student.related_creche.toLowerCase().includes(query))
-    );
-    setFilteredStudents(filtered);
   };
 
   const handleDeleteClick = (student) => {
@@ -128,16 +119,18 @@ const Students = () => {
   const confirmDelete = async () => {
     if (studentToDelete) {
       try {
-        const token = localStorage.getItem('jwtToken');
-        await axios.delete(`https://shaqeel.wordifysites.com/wp-json/wp/v2/student/${studentToDelete.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setStudents(students.filter(s => s.id !== studentToDelete.id));
-        setFilteredStudents(filteredStudents.filter(s => s.id !== studentToDelete.id));
+        const { error } = await supabase
+          .from('students')
+          .delete()
+          .match({ id: studentToDelete.id });
+
+        if (error) throw new Error(error.message);
+
+        setStudents(prev => prev.filter(s => s.id !== studentToDelete.id));
+        setFilteredStudents(prev => prev.filter(s => s.id !== studentToDelete.id));
         setShowDeleteOverlay(false);
-      } catch (err) {
-        console.error('Delete Error:', err);
-        setError('Failed to delete student');
+      } catch (error) {
+        console.error('Error deleting student:', error);
       }
     }
   };
@@ -147,10 +140,28 @@ const Students = () => {
     setStudentToDelete(null);
   };
 
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    const filtered = students.filter(student =>
+      student.name.toLowerCase().includes(query) ||
+      (student.class && student.class.toLowerCase().includes(query))
+    );
+    setFilteredStudents(filtered);
+  };
+
+  const handleBroadcastClick = () => {
+    setShowBroadcast(true);
+  };
+
+  const handleCloseBroadcast = () => {
+    setShowBroadcast(false);
+  };
+
   return (
-    <div className="students-container">
+    <div className="students">
       <div className="header-container">
-        <h1>My Students</h1>
+        <h1>Students</h1>
         <div className="sub-header-container">
           <input
             type="text"
@@ -160,7 +171,7 @@ const Students = () => {
             className="search-bar"
           />
           <button onClick={exportToExcel} className="export-button">
-            <i className="fas fa-file-export"></i> Export to Excel
+            <i className="fas fa-file-export"></i> Export Students Report
           </button>
           <button onClick={handleAddStudentClick} className="add-student-button">
             <i className="fas fa-user-plus"></i> Add Student
@@ -170,29 +181,30 @@ const Students = () => {
           </button>
         </div>
       </div>
-      {error && <p className="error-message">{error}</p>}
-      {filteredStudents.length > 0 ? (
-        <div className="student-grid">
-          {filteredStudents.map(student => (
+      <div className="students-grid">
+        {filteredStudents.length > 0 ? (
+          filteredStudents.map(student => (
             <div key={student.id} className="student-card">
-              <h3>{student.title.rendered}</h3>
-              <p>Creche: {student.related_creche || 'Unknown'}</p>
-              <button onClick={() => handleStudentClick(student)}>View Details</button>
+              <h2>{student.name || 'No Name Provided'}</h2>
+              <p><strong>Age:</strong> {student.age || 'Not Specified'}</p>
+              <p><strong>Class:</strong> {student.class || 'Not Specified'}</p>
+              <p><strong>Parent's Name:</strong> {student.parent_name || 'Not Specified'}</p>
+              <p><strong>Contact:</strong> {student.contact || 'Not Specified'}</p>
+              <button onClick={() => handleViewDetails(student)}>View Details</button>
               <button onClick={() => handleDeleteClick(student)} className="delete-button">Delete Student</button>
             </div>
-          ))}
-        </div>
-      ) : (
-        <p>No students found.</p>
-      )}
+          ))
+        ) : (
+          <p>No students available</p>
+        )}
+      </div>
       {showAddStudent && (
         <AddStudent onClose={handleCloseAddStudent} onStudentAdded={handleStudentAdded} />
       )}
-      {selectedStudent && (
+      {showStudentDetails && selectedStudent && (
         <StudentDetails
           student={selectedStudent}
           onClose={handleCloseStudentDetails}
-          onStudentUpdated={handleStudentUpdated}
         />
       )}
       {showBroadcast && (
@@ -201,7 +213,7 @@ const Students = () => {
       {showDeleteOverlay && (
         <div className="overlay">
           <div className="warning-overlay">
-            <p>Are you sure you want to delete {studentToDelete?.title.rendered}?</p>
+            <p>Are you sure you want to delete {studentToDelete?.name}?</p>
             <button onClick={confirmDelete} className="confirm-delete-button">Yes, Delete</button>
             <button onClick={cancelDelete} className="cancel-delete-button">Cancel</button>
           </div>
