@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom'; // Ensure this import if not already included
+import { supabase } from '../supabaseOperations/supabaseClient'; // Adjust the path as needed
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill/dist/quill.snow.css'; // Ensure this path is correct
 import './CrecheDetails.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faTimes, faGlobe, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 const CrecheDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Ensure you have the correct route params
   const [creche, setCreche] = useState(null);
   const [editable, setEditable] = useState(false);
   const [formData, setFormData] = useState({});
@@ -17,36 +17,41 @@ const CrecheDetails = () => {
 
   useEffect(() => {
     const fetchCreche = async () => {
-      const token = localStorage.getItem('jwtToken');
       try {
-        const response = await axios.get(`https://shaqeel.wordifysites.com/wp-json/wp/v2/creche/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const { data, error } = await supabase
+          .from('creches') // Replace 'creches' with your actual table name
+          .select('*')
+          .eq('id', id)
+          .single();
 
-        const postSlug = response.data.slug;
-        setCreche(response.data);
+        if (error) {
+          throw error;
+        }
+
+        setCreche(data);
         setFormData({
-          title: response.data.title.rendered || '',
-          description: response.data.content.rendered || '',
-          price: response.data.price || '',
-          phoneNumber: response.data.phone_number || '',
-          email: response.data.email || '',
-          address: response.data.address || '',
-          headerImage: response.data.header_image || '',
-          logo: response.data.logo || '',
-          maxStudents: response.data.max_students || '',
-          whatsapp: response.data.whatsapp || '',
-          user: response.data.user || '',
-          latitude: response.data.latitude || '',
-          longitude: response.data.longitude || '',
-          facebook: response.data.facebook || '',
-          instagram: response.data.instagram || '',
-          postSlug: postSlug
+          name: data.name || '',
+          address: data.address || '',
+          phoneNumber: data.phone_number || '',
+          email: data.email || '',
+          capacity: data.capacity || '',
+          operatingHours: data.operating_hours || '',
+          website: data.website_url || '',
+          description: data.description || '',
+          registered: data.registered || '',
+          facebook: data.facebook_url || '',
+          twitter: data.twitter_url || '',
+          instagram: data.instagram_url || '',
+          linkedin: data.linkedin_url || '',
+          whatsapp: data.whatsapp_number || '',
+          telegram: data.telegram_number || '',
+          price: data.price || '',
+          headerImage: data.header_image || '',
+          logo: data.logo || '' // Added logo to formData
         });
       } catch (err) {
-        setError(err.response ? err.response.data.message : 'Failed to fetch creche details');
+        setError('Failed to fetch creche details');
+        console.error('Error fetching creche details:', err);
       }
     };
 
@@ -54,10 +59,10 @@ const CrecheDetails = () => {
   }, [id]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prevData => ({
       ...prevData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
@@ -70,26 +75,44 @@ const CrecheDetails = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('jwtToken');
     setError('');
     setSuccess('');
-    
+  
     try {
-      const response = await axios.put(`https://shaqeel.wordifysites.com/wp-json/wp/v2/creche/${id}`, {
-        ...formData,
-        content: formData.description, // For the 'content' field in WP
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      });
-      
-      setCreche(response.data);
+      const { error } = await supabase
+        .from('creches') // Replace 'creches' with your actual table name
+        .update({
+          name: formData.name,
+          address: formData.address,
+          phone_number: formData.phoneNumber,
+          email: formData.email,
+          capacity: formData.capacity,
+          operating_hours: formData.operatingHours,
+          website_url: formData.website,
+          description: formData.description,
+          registered: formData.registered,
+          facebook_url: formData.facebook,
+          twitter_url: formData.twitter,
+          instagram_url: formData.instagram,
+          linkedin_url: formData.linkedin,
+          whatsapp_number: formData.whatsapp,
+          telegram_number: formData.telegram,
+          price: formData.price,
+          header_image: formData.headerImage,
+          logo: formData.logo
+        })
+        .eq('id', id);
+  
+      if (error) {
+        throw error;
+      }
+  
+      setCreche({ ...creche, ...formData });
       setSuccess('Creche details updated successfully!');
       setEditable(false);
     } catch (err) {
-      setError(err.response ? err.response.data.message : 'Failed to update creche details');
+      setError(`Failed to update creche details: ${err.message}`);
+      console.error('Error updating creche details:', err);
     }
   };
 
@@ -99,28 +122,32 @@ const CrecheDetails = () => {
 
   const handleCancel = () => {
     setEditable(false);
-    setFormData({
-      title: creche.title.rendered || '',
-      description: creche.content.rendered || '',
-      price: creche.price || '',
-      phoneNumber: creche.phone_number || '',
-      email: creche.email || '',
-      address: creche.address || '',
-      headerImage: creche.header_image || '',
-      logo: creche.logo || '',
-      maxStudents: creche.max_students || '',
-      whatsapp: creche.whatsapp || '',
-      user: creche.user || '',
-      latitude: creche.latitude || '',
-      longitude: creche.longitude || '',
-      facebook: creche.facebook || '',
-      instagram: creche.instagram || '',
-      postSlug: creche.slug || ''
-    });
+    if (creche) {
+      setFormData({
+        name: creche.name || '',
+        address: creche.address || '',
+        phoneNumber: creche.phone_number || '',
+        email: creche.email || '',
+        capacity: creche.capacity || '',
+        operatingHours: creche.operating_hours || '',
+        website: creche.website_url || '',
+        description: creche.description || '',
+        registered: creche.registered || '',
+        facebook: creche.facebook_url || '',
+        twitter: creche.twitter_url || '',
+        instagram: creche.instagram_url || '',
+        linkedin: creche.linkedin_url || '',
+        whatsapp: creche.whatsapp_number || '',
+        telegram: creche.telegram_number || '',
+        price: creche.price || '',
+        headerImage: creche.header_image || '',
+        logo: creche.logo || '' // Added logo to formData
+      });
+    }
   };
 
   const handleContact = () => {
-    const subject = `Inquiry about ${formData.title}`;
+    const subject = `Inquiry about ${formData.name}`;
     window.location.href = `mailto:support@crechespots.co.za?subject=${encodeURIComponent(subject)}`;
   };
 
@@ -135,7 +162,7 @@ const CrecheDetails = () => {
       ) : (
         <div className="details-container">
           <div className="form-container">
-            <h1>{formData.title}</h1>
+            <h1>{formData.name}</h1>
             <form onSubmit={handleSave}>
               <div className="form-group">
                 <label htmlFor="description">Description</label>
@@ -145,7 +172,8 @@ const CrecheDetails = () => {
                   value={formData.description}
                   onChange={handleEditorChange}
                   readOnly={!editable}
-                  theme={editable ? 'snow' : 'bubble'}
+                  theme="snow"
+                  className={`quill-editor ${editable ? '' : 'quill-editor-readonly'}`}
                   required
                 />
               </div>
@@ -219,56 +247,34 @@ const CrecheDetails = () => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="maxStudents">Max Students</label>
+                <label htmlFor="capacity">Capacity</label>
                 <input
                   type="number"
-                  id="maxStudents"
-                  name="maxStudents"
-                  value={formData.maxStudents}
+                  id="capacity"
+                  name="capacity"
+                  value={formData.capacity}
                   onChange={handleChange}
                   readOnly={!editable}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="whatsapp">WhatsApp</label>
+                <label htmlFor="operatingHours">Operating Hours</label>
                 <input
                   type="text"
-                  id="whatsapp"
-                  name="whatsapp"
-                  value={formData.whatsapp}
+                  id="operatingHours"
+                  name="operatingHours"
+                  value={formData.operatingHours}
                   onChange={handleChange}
                   readOnly={!editable}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="user">User</label>
+                <label htmlFor="website">Website URL</label>
                 <input
                   type="text"
-                  id="user"
-                  name="user"
-                  value={formData.user}
-                  onChange={handleChange}
-                  readOnly={!editable}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="latitude">Latitude</label>
-                <input
-                  type="text"
-                  id="latitude"
-                  name="latitude"
-                  value={formData.latitude}
-                  onChange={handleChange}
-                  readOnly={!editable}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="longitude">Longitude</label>
-                <input
-                  type="text"
-                  id="longitude"
-                  name="longitude"
-                  value={formData.longitude}
+                  id="website"
+                  name="website"
+                  value={formData.website}
                   onChange={handleChange}
                   readOnly={!editable}
                 />
@@ -285,12 +291,56 @@ const CrecheDetails = () => {
                 />
               </div>
               <div className="form-group">
+                <label htmlFor="twitter">Twitter</label>
+                <input
+                  type="text"
+                  id="twitter"
+                  name="twitter"
+                  value={formData.twitter}
+                  onChange={handleChange}
+                  readOnly={!editable}
+                />
+              </div>
+              <div className="form-group">
                 <label htmlFor="instagram">Instagram</label>
                 <input
                   type="text"
                   id="instagram"
                   name="instagram"
                   value={formData.instagram}
+                  onChange={handleChange}
+                  readOnly={!editable}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="linkedin">LinkedIn</label>
+                <input
+                  type="text"
+                  id="linkedin"
+                  name="linkedin"
+                  value={formData.linkedin}
+                  onChange={handleChange}
+                  readOnly={!editable}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="whatsapp">WhatsApp</label>
+                <input
+                  type="text"
+                  id="whatsapp"
+                  name="whatsapp"
+                  value={formData.whatsapp}
+                  onChange={handleChange}
+                  readOnly={!editable}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="telegram">Telegram</label>
+                <input
+                  type="text"
+                  id="telegram"
+                  name="telegram"
+                  value={formData.telegram}
                   onChange={handleChange}
                   readOnly={!editable}
                 />
@@ -315,7 +365,7 @@ const CrecheDetails = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => window.open(`https://shaqeel.wordifysites.com/${formData.postSlug}`, '_blank')}
+                  onClick={() => window.open(formData.website, '_blank')}
                 >
                   <FontAwesomeIcon icon={faGlobe} /> Website
                 </button>
@@ -327,7 +377,6 @@ const CrecheDetails = () => {
                 <div className="logo-container">
                   <h3>Logo</h3>
                   <img src={formData.logo} alt="Logo" className="logo-image" />
-                  <p>Heading Image</p>
                 </div>
                 <div className="header-image-container">
                   <img src={formData.headerImage} alt="Header" className="header-image" />

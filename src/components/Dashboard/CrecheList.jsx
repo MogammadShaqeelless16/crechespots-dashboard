@@ -63,24 +63,26 @@ const CrecheList = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="creche-list">
-      <h2>My Centre</h2>
-      <p>Welcome, {userName}!</p>
+    <div className="creche-list-container">
+      <h1>Welcome, {userName}!</h1>
+      <h2>My Creches</h2>
       {creches.length > 0 ? (
-        creches.map((creche) => (
-          <div key={creche.id} className="creche-box">
-            <div className="creche-image-container">
-              <img
-                src={creche.header_image || 'default-image-url'}
-                alt={creche.name}
-                className="creche-image"
-              />
+        <div className="creche-grid">
+          {creches.map((creche) => (
+            <div key={creche.id} className="creche-box">
+              <div className="creche-image-container">
+                <img
+                  src={creche.header_image || 'default-image-url'}
+                  alt={creche.name}
+                  className="creche-image"
+                />
+              </div>
+              <h3>{creche.name}</h3>
+              <p>Price: {creche.price || 'Not available'}</p>
+              <button onClick={() => navigate(`/creche/${creche.id}`)}>Explore</button>
             </div>
-            <h3>{creche.name}</h3>
-            <p>Price: {creche.price || 'Not available'}</p>
-            <button onClick={() => navigate(`/creche/${creche.id}`)}>Explore</button>
-          </div>
-        ))
+          ))}
+        </div>
       ) : (
         <p>No creche assigned.</p>
       )}

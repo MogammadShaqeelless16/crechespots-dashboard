@@ -1,34 +1,52 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseOperations/supabaseClient'; // Adjust import path
 import './Style/StaffDetails.css';
 
 const StaffDetails = ({ staff, onClose, onUpdate }) => {
-  const [name, setName] = useState(staff.title.rendered);
-  const [qualification, setQualification] = useState(staff.qualification || '');
-  const [staffNumber, setStaffNumber] = useState(staff.staff_number || '');
-  const [email, setEmail] = useState(staff.staff_email || '');
-  const [position, setPosition] = useState(staff.position || '');
+  const [name, setName] = useState('');
+  const [qualification, setQualification] = useState('');
+  const [staffNumber, setStaffNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [position, setPosition] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (staff) {
+      setName(staff.name || '');
+      setQualification(staff.qualification || '');
+      setStaffNumber(staff.staff_number || '');
+      setEmail(staff.email || '');
+      setPosition(staff.position || '');
+    }
+  }, [staff]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('jwtToken');
+
+    if (!staff || !staff.id) {
+      setError('Staff data is not available.');
+      return;
+    }
+
     try {
-      await axios.put(`https://shaqeel.wordifysites.com/wp-json/wp/v2/staff/${staff.id}`, {
-        title: { rendered: name },
-        qualification,
-        staff_number: staffNumber,
-        staff_email: email,
-        position,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      onUpdate();
-      onClose();
+      const { data, error } = await supabase
+        .from('staff')
+        .update({
+          name,
+          qualification,
+          staff_number: staffNumber,
+          email,
+          position,
+        })
+        .match({ id: staff.id });
+
+      if (error) throw new Error(error.message);
+
+      console.log('Staff updated successfully:', data);
+      onUpdate();  // Notify parent component
+      onClose();   // Close the modal
     } catch (err) {
-      setError(err.response ? err.response.data.message : 'Failed to update staff');
+      setError(err.message || 'Failed to update staff');
     }
   };
 

@@ -54,11 +54,13 @@ const Help = () => {
     const handleArticleClick = (article) => {
         setSelectedArticle(article);
         setEditorContent(article.content); // Load content into editor
+        setNewArticleTitle(article.title); // Load title into title field
     };
 
     const handleOverlayClose = () => {
         setSelectedArticle(null);
         setEditorContent(''); // Clear editor content
+        setNewArticleTitle(''); // Clear title field
         setShowAddForm(false); // Close the add form if open
     };
 
@@ -66,12 +68,12 @@ const Help = () => {
         if (userRole === 'Administrator' || userRole === 'Developer') {
             const { error } = await supabase
                 .from('help_articles')
-                .update({ content: editorContent })
+                .update({ title: newArticleTitle, content: editorContent })
                 .eq('id', selectedArticle.id);
             if (!error) {
                 // Refresh articles after editing
                 setHelpArticles(helpArticles.map(article =>
-                    article.id === selectedArticle.id ? { ...article, content: editorContent } : article
+                    article.id === selectedArticle.id ? { ...article, title: newArticleTitle, content: editorContent } : article
                 ));
                 handleOverlayClose(); // Close overlay after editing
             }
@@ -168,9 +170,15 @@ const Help = () => {
             {selectedArticle && (
                 <div className="overlay">
                     <div className="overlay-content">
-                        <h2>{selectedArticle.title}</h2>
                         {userRole === 'Administrator' || userRole === 'Developer' ? (
                             <>
+                            <text>Title</text>
+                                <input
+                                    type="text"
+                                    value={newArticleTitle}
+                                    onChange={(e) => setNewArticleTitle(e.target.value)}
+                                />
+                            <text>Content</text>
                                 <ReactQuill
                                     value={editorContent}
                                     onChange={setEditorContent}
@@ -179,7 +187,10 @@ const Help = () => {
                                 <button onClick={handleArticleDelete}>Delete</button>
                             </>
                         ) : (
-                            <div dangerouslySetInnerHTML={{ __html: selectedArticle.content }} />
+                            <>
+                                <h2>{selectedArticle.title}</h2>
+                                <div dangerouslySetInnerHTML={{ __html: selectedArticle.content }} />
+                            </>
                         )}
                         <button onClick={handleOverlayClose}>Close</button>
                     </div>

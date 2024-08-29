@@ -16,6 +16,7 @@ import Help from './components/help/help';
 import CrecheListScreen from './components/Admin/CrecheManagement/CrecheListScreen';
 import UserManagementScreen from './components/Admin/UserManagement/UserManagementScreen';
 import InvoiceGenerator from './components/Reports/InvoiceGenerator';
+import AttendanceStaffReport from './components/Reports/AttendanceStaffReport'; // Import Staff Attendance Report
 import { DataProvider } from './Context/DataContext'; // Import the DataProvider
 import supabase  from './supabaseOperations/supabaseClient'; // Import Supabase client
 
@@ -69,6 +70,7 @@ function App() {
             <Route path="/students" element={<ProtectedRoute element={<Students />} />} />
             <Route path="/applications" element={<ProtectedRoute element={<Applications />} />} />
             <Route path="/reports" element={<ProtectedRoute element={<Report />} />} />
+            <Route path="/reports/staff-attendance" element={<ProtectedRoute element={<AttendanceStaffReport month={8} year={2024} />} />} />
             <Route path="/invoice-generator" element={<InvoiceGenerator />} />
             <Route path="/crecheWishlist" element={<ProtectedRoute element={<CrecheWishlist />} />} />
             <Route path="/help" element={<ProtectedRoute element={<Help />} />} />

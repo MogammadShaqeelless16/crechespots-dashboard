@@ -15,7 +15,7 @@ const AddCreche = ({ onClose }) => {
       setError('Title is required.');
       return;
     }
-
+    
     try {
       const { error } = await supabase
         .from('creches')

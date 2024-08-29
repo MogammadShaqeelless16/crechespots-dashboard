@@ -93,3 +93,43 @@ export const deleteUser = async (userId) => {
     return { success: false, error: error.message };
   }
 };
+
+
+export const fetchCurrentUserData = async () => {
+  try {
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    if (!user) {
+      throw new Error('No user is currently logged in.');
+    }
+
+    // Fetch creche IDs associated with the current user
+    const { data, error } = await supabase
+      .from('user_creche')
+      .select('creche_id')
+      .eq('user_id', user.id);
+
+    if (error) {
+      throw error;
+    }
+
+    // Extract creche IDs
+    const crecheIds = data.map(uc => uc.creche_id);
+
+    return {
+      success: true,
+      data: {
+        userId: user.id,
+        crecheIds
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching user creche IDs:', error.message);
+    return { success: false, error: error.message };
+  }
+};

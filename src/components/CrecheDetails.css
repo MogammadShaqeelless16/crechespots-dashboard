@@ -132,3 +132,38 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.quill-editor {
+  height: 200px; /* Adjust the height as needed */
+  margin-bottom: 1em;
+}
+
+.quill-editor-readonly .ql-editor {
+  background-color: #f9f9f9; /* Optional: background color for readonly editor */
+}
+
+.error, .success {
+  color: red; /* Adjust color as needed */
+  margin-bottom: 1em;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #000;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
