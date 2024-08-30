@@ -1,35 +1,213 @@
-.application-item {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  padding: 15px;
-  position: relative;
-}
-
-.applications-container{
+/* Container for the entire applications component */
+.applications-container {
   padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.application-item p {
-  margin: 5px 0;
+/* Header styling */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.application-actions {
-  margin-top: 10px;
+.header-container h1 {
+  font-size: 24px;
 }
 
-.view-button, .delete-button {
-  background: none;
-  border: solid;
+.make-student-button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  background: #4CAF50; /* Green color */
+  color: #fff;
   margin-right: 10px;
 }
 
-.view-button i, .delete-button i {
+.make-student-button i {
   margin-right: 5px;
 }
 
+
+.sub-header-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+}
+
+/* Search bar styling */
+.search-bar {
+  padding: 8px;
+  width: 250px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Add Application and Broadcast buttons */
+.add-application-button,
+.broadcast-button {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.broadcast-button {
+  background-color: #28a745;
+}
+
+.add-application-button:hover,
+.broadcast-button:hover {
+  background-color: #0056b3;
+}
+
+.broadcast-button:hover {
+  background-color: #218838;
+}
+
+/* Table styling */
+.application-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.application-table th,
+.application-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.application-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  color: #333;
+}
+
+.application-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.application-table td {
+  color: #555;
+}
+
+/* Action buttons */
+.application-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.application-actions button {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.view-button {
+  background-color: #17a2b8;
+}
+
+.approve-button {
+  background-color: #28a745;
+}
+
+.decline-button {
+  background-color: #dc3545;
+}
+
 .delete-button {
-  color: red;
+  background-color: #ffc107;
+}
+
+.view-button:hover {
+  background-color: #138496;
+}
+
+.approve-button:hover {
+  background-color: #218838;
+}
+
+.decline-button:hover {
+  background-color: #c82333;
+}
+
+.delete-button:hover {
+  background-color: #e0a800;
+}
+
+/* Overlay for delete confirmation */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.warning-overlay {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.warning-overlay p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.confirm-delete-button,
+.cancel-delete-button {
+  padding: 10px 15px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.confirm-delete-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.cancel-delete-button {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.confirm-delete-button:hover {
+  background-color: #c82333;
+}
+
+.cancel-delete-button:hover {
+  background-color: #5a6268;
 }

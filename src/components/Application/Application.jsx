@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseOperations/supabaseClient';
+import { fetchCurrentUserData } from '../../supabaseOperations/userOperations';
 import ApplicationDetails from './ApplicationDetails';
 import AddApplication from './AddApplication';
 import BroadcastDetails from '../Student/BroadcastDetails';
@@ -19,14 +20,36 @@ const Applications = () => {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const { data: applications, error } = await supabase
+        const { success, data, error } = await fetchCurrentUserData();
+
+        if (!success) {
+          setApplications([]);
+          setFilteredApplications([]);
+          return;
+        }
+
+        const { crecheIds } = data;
+
+        if (!Array.isArray(crecheIds) || crecheIds.length === 0) {
+          setApplications([]);
+          setFilteredApplications([]);
+          return;
+        }
+
+        const { data: applicationsData, error: applicationsError } = await supabase
           .from('applications')
-          .select('*');
+          .select('*')
+          .in('creche_id', crecheIds);
 
-        if (error) throw error;
+        if (applicationsError) throw new Error(applicationsError.message);
 
-        setApplications(applications);
-        setFilteredApplications(applications);
+        if (Array.isArray(applicationsData)) {
+          setApplications(applicationsData);
+          setFilteredApplications(applicationsData);
+        } else {
+          setApplications([]);
+          setFilteredApplications([]);
+        }
       } catch (err) {
         console.error('Fetch Error:', err);
         setError('Failed to fetch applications');
@@ -117,6 +140,40 @@ const Applications = () => {
     setShowBroadcast(false);
   };
 
+  const handleMakeStudent = async (application) => {
+    try {
+      // Insert application data into the students table
+      const { error: insertError } = await supabase
+        .from('students')
+        .insert([{
+          // Map application fields to student fields as necessary
+          parent_name: application.parent_name, // Example mapping
+          parent_phone_number: application.parent_phone_number,
+          parent_email: application.parent_email,
+          address: application.parent_address,
+          creche_id: application.creche_id,
+          created_at: new Date().toISOString(), // Assuming you want to track when the student was created
+        }]);
+
+      if (insertError) throw insertError;
+
+      // Delete the application from the applications table
+      const { error: deleteError } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', application.id);
+
+      if (deleteError) throw deleteError;
+
+      // Update state to remove the application
+      setApplications(applications.filter(app => app.id !== application.id));
+      setFilteredApplications(filteredApplications.filter(app => app.id !== application.id));
+    } catch (err) {
+      console.error('Make Student Error:', err);
+      setError('Failed to create student');
+    }
+  };
+
   const confirmDelete = () => {
     if (applicationToDelete) {
       handleDeleteApplication(applicationToDelete.id);
@@ -130,8 +187,8 @@ const Applications = () => {
 
   return (
     <div className="applications-container">
+      <h1>Applications</h1>
       <div className="header-container">
-        <h1>Applications</h1>
         <div className="sub-header-container">
           <input
             type="text"
@@ -149,39 +206,55 @@ const Applications = () => {
         </div>
       </div>
       {error && <p className="error-message">{error}</p>}
-      <div className="application-grid">
-        {filteredApplications.length > 0 ? (
-          filteredApplications.map(application => (
-            <div key={application.id} className="application-item">
-              <h3>{application.title}</h3>
-              <p><strong>Parent's Name:</strong> {application.parent_name}</p>
-              <p><strong>Parent's Phone Number:</strong> {application.parent_phone_number}</p>
-              <p><strong>Parent's Email:</strong> {application.parent_email}</p>
-              <p><strong>Description:</strong> {application.description}</p>
-              <p><strong>Status:</strong> {application.application_status || 'New'}</p>
-              <div className="application-actions">
-                <button onClick={() => handleApplicationClick(application)} className="view-button">
-                  <i className="fas fa-eye"></i> View Details
-                </button>
-                <button onClick={() => handleStatusChange(application.id, 'Approved')} className="approve-button">
-                  <i className="fas fa-check"></i> Approve
-                </button>
-                <button onClick={() => handleStatusChange(application.id, 'Declined')} className="decline-button">
-                  <i className="fas fa-times"></i> Decline
-                </button>
-                <button onClick={() => {
-                  setApplicationToDelete(application);
-                  setShowDeleteOverlay(true);
-                }} className="delete-button">
-                  <i className="fas fa-trash"></i> Delete
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No applications found.</p>
-        )}
-      </div>
+      <table className="application-table">
+        <thead>
+          <tr>
+            <th>Application Source</th>
+            <th>Parent's Name</th>
+            <th>Parent's Phone Number</th>
+            <th>Parent's Email</th>
+            <th>Message</th>
+            <th>Application Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredApplications.length > 0 ? (
+            filteredApplications.map(application => (
+              <tr key={application.id}>
+                <td>{application.source}</td>
+                <td>{application.parent_name}</td>
+                <td>{application.parent_phone_number}</td>
+                <td>{application.parent_email}</td>
+                <td>{application.message}</td>
+                <td>{application.created_at}</td>
+                <td>{application.application_status || 'New'}</td>
+                <td className="application-actions">
+                  <button onClick={() => handleApplicationClick(application)} className="view-button">
+                    <i className="fas fa-eye"></i> View
+                  </button>
+                  {application.application_status === 'Approved' && (
+                    <button onClick={() => handleMakeStudent(application)} className="make-student-button">
+                      <i className="fas fa-user-plus"></i> Make Student
+                    </button>
+                  )}
+                  <button onClick={() => {
+                    setApplicationToDelete(application);
+                    setShowDeleteOverlay(true);
+                  }} className="delete-button">
+                    <i className="fas fa-trash"></i> Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="8">No applications found.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
       {selectedApplication && (
         <ApplicationDetails
           application={selectedApplication}

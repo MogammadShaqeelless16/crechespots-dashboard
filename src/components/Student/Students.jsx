@@ -67,10 +67,12 @@ const Students = () => {
 
     const ws = XLSX.utils.json_to_sheet(filteredStudents.map(student => ({
       Name: student.name || 'N/A',
-      Age: student.age || 'N/A',
-      Class: student.class || 'N/A',
+      DOB: student.dob || 'N/A',
       ParentName: student.parent_name || 'N/A',
-      Contact: student.contact || 'N/A',
+      ParentPhoneNumber: student.parent_phone_number || 'N/A',
+      ParentEmail: student.parent_email || 'N/A',
+      FeesOwed: student.fees_owed || '0',
+      FeesPaid: student.fees_paid || '0',
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Students Report');
@@ -145,7 +147,7 @@ const Students = () => {
     setSearchQuery(query);
     const filtered = students.filter(student =>
       student.name.toLowerCase().includes(query) ||
-      (student.class && student.class.toLowerCase().includes(query))
+      (student.parent_name && student.parent_name.toLowerCase().includes(query))
     );
     setFilteredStudents(filtered);
   };
@@ -159,65 +161,80 @@ const Students = () => {
   };
 
   return (
-    <div className="students">
-      <div className="header-container">
-        <h1>Students</h1>
-        <div className="sub-header-container">
-          <input
-            type="text"
-            placeholder="Search students..."
-            value={searchQuery}
-            onChange={handleSearch}
-            className="search-bar"
-          />
-          <button onClick={exportToExcel} className="export-button">
-            <i className="fas fa-file-export"></i> Export Students Report
-          </button>
-          <button onClick={handleAddStudentClick} className="add-student-button">
-            <i className="fas fa-user-plus"></i> Add Student
-          </button>
-          <button onClick={handleBroadcastClick} className="broadcast-button">
-            <i className="fas fa-broadcast-tower"></i> Broadcast
-          </button>
-        </div>
+    <div className="students-container">
+      <h1>Student List</h1>
+      <div className="students-actions">
+        <button onClick={handleAddStudentClick}>Add Student</button>
+        <button onClick={exportToExcel}>Export</button>
+        <button onClick={handleBroadcastClick}>Broadcast</button>
+        <input
+          type="text"
+          placeholder="Search by name or parent name"
+          value={searchQuery}
+          onChange={handleSearch}
+        />
       </div>
-      <div className="students-grid">
-        {filteredStudents.length > 0 ? (
-          filteredStudents.map(student => (
-            <div key={student.id} className="student-card">
-              <h2>{student.name || 'No Name Provided'}</h2>
-              <p><strong>Age:</strong> {student.age || 'Not Specified'}</p>
-              <p><strong>Class:</strong> {student.class || 'Not Specified'}</p>
-              <p><strong>Parent's Name:</strong> {student.parent_name || 'Not Specified'}</p>
-              <p><strong>Contact:</strong> {student.contact || 'Not Specified'}</p>
-              <button onClick={() => handleViewDetails(student)}>View Details</button>
-              <button onClick={() => handleDeleteClick(student)} className="delete-button">Delete Student</button>
-            </div>
-          ))
-        ) : (
-          <p>No students available</p>
-        )}
-      </div>
+      <table className="students-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Date of Birth</th>
+            <th>Parent Name</th>
+            <th>Parent Phone Number</th>
+            <th>Fees Owed</th>
+            <th>Fees Paid</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredStudents.map(student => (
+            <tr key={student.id}>
+              <td>{student.name}</td>
+              <td>{student.dob}</td>
+              <td>{student.parent_name}</td>
+              <td>{student.parent_phone_number}</td>
+              <td>R {student.fees_owed || 'N/A'}</td>
+              <td>R {student.fees_paid || 'N/A'}</td>
+              <td>
+                <button onClick={() => handleViewDetails(student)}>View Details</button>
+                <button onClick={() => handleDeleteClick(student)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       {showAddStudent && (
-        <AddStudent onClose={handleCloseAddStudent} onStudentAdded={handleStudentAdded} />
+        <AddStudent
+          onClose={handleCloseAddStudent}
+          onStudentAdded={handleStudentAdded}
+        />
       )}
+
       {showStudentDetails && selectedStudent && (
         <StudentDetails
           student={selectedStudent}
           onClose={handleCloseStudentDetails}
+          onStudentUpdated={() => setSelectedStudent(null)} // Optionally trigger an update
         />
       )}
-      {showBroadcast && (
-        <BroadcastDetails onClose={handleCloseBroadcast} />
-      )}
+
       {showDeleteOverlay && (
-        <div className="overlay">
-          <div className="warning-overlay">
-            <p>Are you sure you want to delete {studentToDelete?.name}?</p>
-            <button onClick={confirmDelete} className="confirm-delete-button">Yes, Delete</button>
-            <button onClick={cancelDelete} className="cancel-delete-button">Cancel</button>
+        <div className="delete-overlay">
+          <div className="delete-confirmation">
+            <h3>Are you sure you want to delete this student?</h3>
+            <div className="delete-actions">
+              <button onClick={confirmDelete}>Yes</button>
+              <button onClick={cancelDelete}>No</button>
+            </div>
           </div>
         </div>
+      )}
+
+      {showBroadcast && (
+        <BroadcastDetails
+          onClose={handleCloseBroadcast}
+        />
       )}
     </div>
   );

@@ -3,21 +3,21 @@ import { supabase } from '../../supabaseOperations/supabaseClient';
 import './Style/AddApplication.css'; // Ensure this file contains the styles for the overlay
 
 const AddApplication = ({ onClose, onApplicationAdded }) => {
-  const [title, setTitle] = useState('');
+  const [source, setTitle] = useState('');
   const [parentName, setParentName] = useState('');
   const [parentPhoneNumber, setParentPhoneNumber] = useState('');
   const [parentEmail, setParentEmail] = useState('');
   const [parentAddress, setParentAddress] = useState('');
   const [numberOfChildren, setNumberOfChildren] = useState('');
   const [applicationStatus, setApplicationStatus] = useState('New');
-  const [description, setDescription] = useState('');
+  const [message, setDescription] = useState('');
   const [error, setError] = useState('');
 
   const handleAddApplication = async (e) => {
     e.preventDefault();
 
     // Basic validation
-    if (!title || !parentName || !parentPhoneNumber || !parentEmail || !parentAddress || !numberOfChildren) {
+    if (!source || !parentName || !parentPhoneNumber || !parentEmail || !parentAddress || !numberOfChildren) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -26,14 +26,14 @@ const AddApplication = ({ onClose, onApplicationAdded }) => {
       const { error } = await supabase
         .from('applications')
         .insert([{
-          title,
+          source,
           parent_name: parentName,
           parent_phone_number: parentPhoneNumber,
           parent_email: parentEmail,
           parent_address: parentAddress,
           number_of_children: numberOfChildren,
           application_status: applicationStatus,
-          application_description: description,
+          message: message,
           created_at: new Date().toISOString() // Assuming you want to track when the application was created
         }]);
         
@@ -41,14 +41,14 @@ const AddApplication = ({ onClose, onApplicationAdded }) => {
 
       // Optionally, you can fetch the new application details here
       onApplicationAdded({
-        title,
+        source,
         parent_name: parentName,
         parent_phone_number: parentPhoneNumber,
         parent_email: parentEmail,
         parent_address: parentAddress,
         number_of_children: numberOfChildren,
         application_status: applicationStatus,
-        application_description: description,
+        message: message,
       });
       onClose();
     } catch (err) {
@@ -66,8 +66,8 @@ const AddApplication = ({ onClose, onApplicationAdded }) => {
           {error && <p className="error-message">{error}</p>}
           <input
             type="text"
-            placeholder="Application Title"
-            value={title}
+            placeholder="Application Source"
+            value={source}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
@@ -112,13 +112,13 @@ const AddApplication = ({ onClose, onApplicationAdded }) => {
             required
           >
             <option value="New">New</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-            <option value="Rejected">Rejected</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Declined">Declined</option>
           </select>
           <textarea
-            placeholder="Description"
-            value={description}
+            placeholder="Message"
+            value={message}
             onChange={(e) => setDescription(e.target.value)}
           />
           <div className="form-actions">
