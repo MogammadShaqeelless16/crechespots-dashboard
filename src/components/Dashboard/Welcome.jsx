@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import supabase from '../../supabaseOperations/supabaseClient'; // Adjust import path
-import './welcome.css'; // Ensure this path matches your CSS file location
+import './Welcome.css'; // Ensure this path matches your CSS file location
 
 const Welcome = () => {
   const [userName, setUserName] = useState('');
