@@ -159,7 +159,7 @@ const Layout = ({ children }) => {
                       <FontAwesomeIcon icon={faDatabase} />
                       Integrations
                     </Link>
-                    <Link to="/supporttickets" className="dropdown-item">
+                    <Link to="/supportTicket" className="dropdown-item">
                       <FontAwesomeIcon icon={faTicketAlt} />
                       Support Tickets
                     </Link>

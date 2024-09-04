@@ -20,6 +20,8 @@ import AttendanceStaffReport from './components/Reports/AttendanceStaffReport'; 
 import { DataProvider } from './Context/DataContext'; // Import the DataProvider
 import supabase  from './supabaseOperations/supabaseClient'; // Import Supabase client
 import StudentAttendanceReport from './components/Reports/StudentAttendanceReport';
+import SupportTicket from './components/Admin/SuportTickets/supportTickets';
+import SupportTicketDetails from './components/Admin/SuportTickets/SupportTicketDetails';
 
 // Helper function to protect routes
 const ProtectedRoute = ({ element }) => {
@@ -78,6 +80,8 @@ function App() {
             <Route path="/help" element={<ProtectedRoute element={<Help />} />} />
             <Route path="/userManagement" element={<ProtectedRoute element={<UserManagementScreen />} />} />
             <Route path="/reports/student-attendance" element={<ProtectedRoute element={<StudentAttendanceReport />} />} />
+            <Route path="/supportTicket" element={<ProtectedRoute element={<SupportTicket />} />} />
+            <Route path="/supportTicket/:id" element={<ProtectedRoute element={<SupportTicketDetails />} />} />
             <Route path="/crecheManagement" element={<ProtectedRoute element={<CrecheListScreen />} />} />
             {/* Redirect unknown routes to home */}
             <Route path="*" element={<Navigate to="/" />} />

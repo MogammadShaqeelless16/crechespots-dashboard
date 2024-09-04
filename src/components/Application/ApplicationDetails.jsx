@@ -4,26 +4,26 @@ import './Style/ApplicationDetails.css';
 
 const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [source, setTitle] = useState('');
+  const [source, setSource] = useState('');
   const [parentName, setParentName] = useState('');
   const [parentPhoneNumber, setParentPhoneNumber] = useState('');
   const [parentEmail, setParentEmail] = useState('');
   const [parentAddress, setParentAddress] = useState('');
   const [numberOfChildren, setNumberOfChildren] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('New');
-  const [message, setDescription] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (application) {
-      setTitle(application.source || '');
+      setSource(application.source || '');
       setParentName(application.parent_name || '');
       setParentPhoneNumber(application.parent_phone_number || '');
       setParentEmail(application.parent_email || '');
       setParentAddress(application.parent_address || '');
       setNumberOfChildren(application.number_of_children || '');
       setSelectedStatus(application.application_status || 'New');
-      setDescription(application.message || '');
+      setMessage(application.message || '');
     }
   }, [application]);
 
@@ -44,7 +44,7 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
   };
 
   const handleUpdateApplication = async () => {
-    if (!title || !parentName || !parentPhoneNumber || !parentEmail) {
+    if (!source || !parentName || !parentPhoneNumber || !parentEmail) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -74,40 +74,6 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
     }
   };
 
-  const handleApprove = async () => {
-    try {
-      const { error } = await supabase
-        .from('applications')
-        .update({ application_status: 'Approved' })
-        .eq('id', application.id);
-        
-      if (error) throw error;
-
-      setSelectedStatus('Approved');
-      onUpdate({ ...application, application_status: 'Approved' });
-    } catch (err) {
-      console.error('Approval Error:', err);
-      setError('Failed to approve application');
-    }
-  };
-
-  const handleDecline = async () => {
-    try {
-      const { error } = await supabase
-        .from('applications')
-        .update({ application_status: 'Declined' })
-        .eq('id', application.id);
-        
-      if (error) throw error;
-
-      setSelectedStatus('Declined');
-      onUpdate({ ...application, application_status: 'Declined' });
-    } catch (err) {
-      console.error('Decline Error:', err);
-      setError('Failed to decline application');
-    }
-  };
-
   if (!application) return null;
 
   return (
@@ -120,7 +86,7 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
             <input
               type="text"
               value={source}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => setSource(e.target.value)}
               placeholder="Application Source"
               required
             />
@@ -159,9 +125,21 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
             />
             <textarea
               value={message}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="message"
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Message"
             />
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="status-select"
+            >
+              <option value="New">New</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Reviewed">Reviewed</option>
+              <option value="Approved">Approved</option>
+              <option value="Declined">Declined</option>
+              <option value="Closed">Closed</option>
+            </select>
             <div className="form-actions">
               <button type="button" onClick={handleUpdateApplication} className="update-button">Save Changes</button>
               <button type="button" onClick={() => setIsEditing(false)} className="cancel-button">Cancel</button>
@@ -179,8 +157,6 @@ const ApplicationDetails = ({ application, onClose, onUpdate = () => {} }) => {
             <p><strong>Message:</strong> {application.message}</p>
             <div className="form-actions">
               <button onClick={() => setIsEditing(true)} className="edit-button">Edit</button>
-              <button onClick={handleApprove} className="approve-button">Approve</button>
-              <button onClick={handleDecline} className="decline-button">Decline</button>
             </div>
           </>
         )}
