@@ -9,8 +9,6 @@
   .layout.light {
     background-color: #f4f4f4;
     color: #333;
-    background-image: url(../assets/Light_background.png);
-    background-image: no repeating-linear-gradient(45deg, black, transparent 100px);
     background-repeat: no-repeat;
     background-size: cover;
   }
@@ -18,8 +16,6 @@
   .layout.dark {
     background-color: #333;
     color: #f4f4f4;
-    background-image: url(../assets/dark_background.png);
-    background-image: no repeating-linear-gradient(45deg, black, transparent 100px);
     background-repeat: no-repeat;
     background-size: cover;
   }

@@ -64,9 +64,6 @@ const Login = () => {
 
       <div className="login-content">
         <div className="welcome-section">
-          <div className="logo-container">
-            <img src="/logo.gif" alt="Logo" className="logo-image" />
-          </div>
           <h1>Welcome Back</h1>
           <p>Please login to continue to Creche Spots.</p>
 
