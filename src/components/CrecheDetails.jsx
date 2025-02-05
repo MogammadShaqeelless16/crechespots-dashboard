@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'; // Ensure this import if not already included
 import { supabase } from '../supabaseOperations/supabaseClient'; // Adjust the path as needed
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Ensure this path is correct
 import './CrecheDetails.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faTimes, faGlobe, faEnvelope } from '@fortawesome/free-solid-svg-icons';
@@ -166,16 +164,6 @@ const CrecheDetails = () => {
             <form onSubmit={handleSave}>
               <div className="form-group">
                 <label htmlFor="description">Description</label>
-                <ReactQuill
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleEditorChange}
-                  readOnly={!editable}
-                  theme="snow"
-                  className={`quill-editor ${editable ? '' : 'quill-editor-readonly'}`}
-                  required
-                />
               </div>
               <div className="form-group">
                 <label htmlFor="price">Price</label>

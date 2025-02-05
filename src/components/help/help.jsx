@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import supabase from '../../supabaseOperations/supabaseClient'; // Adjust path as needed
-import ReactQuill from 'react-quill'; // Import the WYSIWYG editor
-import 'react-quill/dist/quill.snow.css'; // Import styles for the editor
 import './style/help.css';
 
 const Help = () => {
@@ -157,10 +155,6 @@ const Help = () => {
                             value={newArticleTitle}
                             onChange={(e) => setNewArticleTitle(e.target.value)}
                         />
-                        <ReactQuill
-                            value={editorContent}
-                            onChange={setEditorContent}
-                        />
                         <button onClick={handleAddArticle}>Add Article</button>
                         <button onClick={handleOverlayClose}>Cancel</button>
                     </div>
@@ -179,10 +173,6 @@ const Help = () => {
                                     onChange={(e) => setNewArticleTitle(e.target.value)}
                                 />
                             <text>Content</text>
-                                <ReactQuill
-                                    value={editorContent}
-                                    onChange={setEditorContent}
-                                />
                                 <button onClick={handleArticleEdit}>Save Changes</button>
                                 <button onClick={handleArticleDelete}>Delete</button>
                             </>
